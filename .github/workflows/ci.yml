@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test-and-build:
+    name: Test and build bundles
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CI: "1"
+      EXPO_NO_TELEMETRY: "1"
+      # Expo/Metro uses os.tmpdir()/metro-cache.
+      TMPDIR: ${{ runner.temp }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js and npm cache
+        id: node
+        uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck and test
+        run: npm run check
+
+      - name: Check formatting
+        run: |
+          npm run format:check
+          npx prettier --check .github/workflows
+
+      - name: Restore Metro transform cache
+        uses: actions/cache@v6
+        with:
+          path: ${{ runner.temp }}/metro-cache
+          key: ${{ runner.os }}-metro-${{ steps.node.outputs.node-version }}-${{ hashFiles('package-lock.json') }}-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-metro-${{ steps.node.outputs.node-version }}-${{ hashFiles('package-lock.json') }}-
+
+      # Bundle validation only: no native signing, Expo account or store secrets.
+      - name: Export iOS and Android bundles
+        run: npx expo export --platform ios --platform android --output-dir dist
+
+      - name: Upload app bundles
+        uses: actions/upload-artifact@v7
+        with:
+          name: aquaair-app-bundles
+          path: dist/
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Upload static website
+        uses: actions/upload-artifact@v7
+        with:
+          name: aquaair-website
+          path: |
+            web/*.html
+            web/styles.css
+            web/assets/
+          if-no-files-found: error
+          retention-days: 7

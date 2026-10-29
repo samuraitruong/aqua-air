@@ -58,7 +58,7 @@ export class WaterReadingService {
         t("readings.duplicateParameter"),
       );
       const id = this.uuid(),
-        now = this.clock();
+        now = new Date(this.clock()).toISOString();
       d.waterParameters.push({
         id,
         tankId,
@@ -85,12 +85,14 @@ export class WaterReadingService {
         : undefined;
       requireValue(!input.id || old, t("error.notFound"));
       requireValue(!old || old.tankId === input.tankId, t("readings.invalid"));
-      const now = this.clock();
+      const now = new Date(this.clock()).toISOString();
       requireValue(
         isTimestamp(input.performedAt) &&
           Date.parse(input.performedAt) <= Date.parse(now) &&
           isDate(input.performedLocalDate) &&
-          input.performedLocalDate <= localDate(new Date(now)),
+          (input.performedLocalDate <= localDate(new Date(now)) ||
+            (old?.performedLocalDate === input.performedLocalDate &&
+              Date.parse(old.performedAt) === Date.parse(input.performedAt))),
         t("readings.invalidDate"),
       );
       requireValue(

@@ -123,7 +123,7 @@ export function WaterReadingsPanel({
                   key={v.parameterKey}
                   style={{ flexBasis: "45%", flexGrow: 1, minWidth: 120 }}
                 >
-                  <Card style={{ height: "100%", gap: 6 }}>
+                  <Card style={{ flex: 1, gap: 6 }}>
                     <Text style={s.label}>
                       {waterParameterLabel(v.parameterKey, v.nameSnapshot)}
                     </Text>

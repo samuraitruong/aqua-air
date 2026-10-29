@@ -230,3 +230,60 @@ test("legacy format-2 backups normalize absent water tables and format-3 count t
   assert.deepEqual(legacy.waterValues, []);
   assert.deepEqual(legacy.waterParameters, []);
 });
+
+test("backup canonicalizes same-second water timestamps before SQL latest selection", async () => {
+  const { store, care, water } = setup();
+  await store.init();
+  const tankId = await care.createTank(tankInput);
+  await water.saveReading({
+    ...input(tankId, "old"),
+    performedAt: "2026-10-28T10:00:00.000Z",
+  });
+  await water.saveReading({
+    ...input(tankId, "new"),
+    performedAt: "2026-10-28T10:00:00.500Z",
+    values: [{ parameterKey: "ph", value: 8 }],
+  });
+  const source = await store.read();
+  source.waterReadings[0]!.performedAt = "2026-10-28T10:00:00Z";
+  const restored = decodeBackup(
+    encodeBackup(source, {}, "2026-10-29T10:00:00Z"),
+  ).data;
+  assert.equal(
+    restored.waterReadings[0]!.performedAt,
+    "2026-10-28T10:00:00.000Z",
+  );
+  await store.write((d) => Object.assign(d, restored));
+  assert.equal(
+    (await store.latestWaterValues(tankId)).find(
+      (v) => v.parameterKey === "ph",
+    )!.value,
+    8,
+  );
+});
+test("editing a past reading retains its captured local date after a timezone boundary; new future dates still fail", async () => {
+  const { store, care, water } = setup();
+  await store.init();
+  const tankId = await care.createTank(tankInput);
+  const id = await water.saveReading(input(tankId));
+  // A captured local date can be one day ahead of the current device after travel.
+  await store.write((d) => {
+    d.waterReadings[0]!.performedLocalDate = "2026-10-30";
+  });
+  const original = (await store.getWaterReading(id))!;
+  await assert.doesNotReject(() =>
+    water.saveReading({
+      ...input(tankId),
+      id,
+      performedLocalDate: original.performedLocalDate,
+      performedAt: original.performedAt,
+      notes: "after travel",
+    }),
+  );
+  await assert.rejects(() =>
+    water.saveReading({
+      ...input(tankId, "future"),
+      performedLocalDate: "2026-10-30",
+    }),
+  );
+});

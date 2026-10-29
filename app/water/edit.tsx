@@ -51,7 +51,7 @@ export default function WaterFormLoader() {
     return () => {
       alive = false;
     };
-  }, [id, app.store, app.historyVersion, retry]);
+  }, [id, app.store, retry]);
   if (id && result.id !== id)
     return (
       <Screen title={t("readings.edit")}>

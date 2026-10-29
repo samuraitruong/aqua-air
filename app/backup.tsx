@@ -136,7 +136,9 @@ export default function Backup() {
           >
             <Icon name={icon} />
             <Text style={s.body}>
-              {n} {quantityLabel(label, Number(n))}
+              {label === "readings.count"
+                ? tr(label, { 0: n })
+                : `${n} ${quantityLabel(label, Number(n))}`}
             </Text>
           </View>
         ))}

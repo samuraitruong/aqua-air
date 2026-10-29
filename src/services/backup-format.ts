@@ -473,6 +473,15 @@ export function decodeBackup(bytes: Uint8Array): BackupPreview {
     l.createdAt = new Date(l.createdAt).toISOString();
     l.updatedAt = new Date(l.updatedAt).toISOString();
   }
+  for (const p of data.waterParameters) {
+    p.createdAt = new Date(p.createdAt).toISOString();
+    p.updatedAt = new Date(p.updatedAt).toISOString();
+  }
+  for (const r of data.waterReadings) {
+    r.performedAt = new Date(r.performedAt).toISOString();
+    r.createdAt = new Date(r.createdAt).toISOString();
+    r.updatedAt = new Date(r.updatedAt).toISOString();
+  }
   data.jobs = [];
   data.outbox = [];
   data.settings = {

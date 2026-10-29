@@ -34,7 +34,7 @@ Vào **Cài đặt → Ngôn ngữ** để chọn **Tiếng Việt**, English, �
 - Đóng/mở app giữ dữ liệu. Gỡ app hoặc xóa dữ liệu ứng dụng có thể làm mất dữ liệu; cần xuất backup trước.
 - Không seed dữ liệu mẫu vào app. Ảnh minh họa chào mừng lấy từ bộ thiết kế, không tạo bản ghi bể hoặc nhật ký.
 
-Schema và migration: `src/repositories/schema.ts`. `SqlStore.init()` đọc `PRAGMA user_version`, nâng version bằng transaction; schema hiện tại **4**. Version 2 thêm index tra cứu lịch theo ngày; version 3 thêm kích thước và bộ lọc, giữ dung tích/lịch sử cũ; version 4 lưu dung tích tại thời điểm thay nước để tính lượng nước theo tháng. Không tự reset database khi có lỗi hoặc gặp version mới hơn.
+Schema và migration: `src/repositories/schema.ts`. `SqlStore.init()` đọc `PRAGMA user_version`, nâng version bằng transaction; schema hiện tại **5**. Version 2 thêm index tra cứu lịch theo ngày; version 3 thêm kích thước và bộ lọc, giữ dung tích/lịch sử cũ; version 4 lưu dung tích tại thời điểm thay nước để tính lượng nước theo tháng; version 5 thêm thông số nước theo bể. Không tự reset database khi có lỗi hoặc gặp version mới hơn.
 
 Tổng quan tải latest log theo lịch và lần thay nước mới nhất mỗi bể. Lịch sử bể dùng cursor `(performedAt,createdAt,id)`, mỗi trang 30 bản ghi, `FlatList` chỉ dựng vùng nhìn thấy. Mutation và export đọc snapshot đầy đủ trong transaction để bảo toàn quy tắc lịch.
 
@@ -60,7 +60,7 @@ Mutation commit dữ liệu/revision/outbox trước khi gọi OS. Worker chạy
 
 ## Sao lưu và khôi phục
 
-Cài đặt → Sao lưu và khôi phục → Tạo bản sao lưu → share sheet chọn nơi lưu. File mới dùng formatVersion 2 và vẫn đọc được backup version 1. `.aquaair` là ZIP gồm `manifest.json`, `data.json` và `photos/*`, có version, counts, sizes và SHA-256; không chứa OS notification ID hoặc absolute sandbox path. File không được app mã hóa.
+Cài đặt → Sao lưu và khôi phục → Tạo bản sao lưu → share sheet chọn nơi lưu. File mới dùng formatVersion 3 và vẫn đọc được backup version 1/2. `.aquaair` là ZIP gồm `manifest.json`, `data.json` và `photos/*`, có version, counts, sizes và SHA-256; không chứa OS notification ID hoặc absolute sandbox path. File không được app mã hóa.
 
 Khôi phục: chọn file → kiểm tra toàn bộ → xem tóm tắt → có thể sao lưu dữ liệu hiện tại → xác nhận Thay thế và khôi phục. MVP không merge.
 
@@ -108,3 +108,17 @@ npm run web:preview            # http://127.0.0.1:5501
 ```
 
 Website tĩnh trong `web/`, chưa deploy. Publisher và URL trong `release/store.json`: Truong Nguyen; privacy/support trên aquaair.truongthings.site. Deploy nội dung `web/` trước rồi chạy `npm run release:check:links`. Không lệnh nào tự upload hay phát hành. Build native cần tối thiểu 8 GiB dung lượng trống; lần kiểm chứng 29/10/2026 dừng do đầy ổ đĩa, chưa có artifact release native được xác nhận.
+
+## Thông số nước theo bể
+
+Trong chi tiết bể, chọn **Ghi nhận thông số nước** hoặc tab **Thông số nước**. Có sẵn pH, nhiệt độ (°C), NH₃/NH₄⁺/NO₂/NO₃/PO₄ (mg/L), GH (°dGH), KH (°dKH), TDS (ppm), độ mặn (ppt). Mỗi lần đo chỉ nhập các chỉ số đã đo, kèm ngày giờ và ghi chú; số 0 hợp lệ. Có thể tạo tối đa 30 chỉ số riêng cho mỗi bể với tên/đơn vị riêng, ví dụ DO (mg/L), ORP (mV), hoặc kết quả bộ test dùng đơn vị/dạng chất khác. Không tự quy đổi các dạng ammonia hoặc suy luận ngưỡng an toàn.
+
+Kết quả gần nhất được lấy riêng cho từng chỉ số và luôn kèm thời gian; lịch sử phân trang 30 lần đo. Có thể sửa/xóa lần đo; bể lưu trữ chỉ xem được. Các bản ghi mới không thay đổi lịch chăm sóc hoặc lượng nước thay trên dashboard.
+
+Sao lưu ghi định dạng **3**, gồm các định nghĩa chỉ số riêng, lần đo và kết quả. Bản cũ định dạng 1/2 vẫn nhập được, với nhật ký đo rỗng. Bản ứng dụng cũ từ chối định dạng 3 để tránh bỏ mất thông số nước.
+
+## GitHub Actions CI
+
+Workflow `.github/workflows/ci.yml` runs on pushes, pull requests and manual dispatch. It uses Node 22, `npm ci`, TypeScript/tests, formatting and Expo exports for both iOS and Android. npm downloads and Metro transforms are cached; Metro cache reuse stays within the same Node version and lockfile. Older runs on the same ref are cancelled.
+
+Successful runs upload `aquaair-app-bundles` and `aquaair-website` artifacts for 7 days. This validates the app bundles and packages the static site; it does not produce signed APK/AAB/IPA files or deploy the website. No signing credentials or Expo account are needed. Native release commands remain documented in [docs/release.md](docs/release.md).

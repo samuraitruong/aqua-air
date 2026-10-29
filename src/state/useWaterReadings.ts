@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useApp } from "./AppProvider";
 import type {
   WaterReading,
@@ -17,10 +17,16 @@ export function useWaterReadings(tankId: string, active: boolean) {
     } | null>(null),
     [error, setError] = useState(false);
   useEffect(() => setCursors([]), [tankId, app.historyVersion]);
+  const [cachedLatest, setCachedLatest] = useState<{
+    tankId: string;
+    values: LatestWaterValue[];
+  }>({ tankId, values: [] });
   const cursor = cursors.at(-1);
+  const queryKey = JSON.stringify([tankId, active, cursor?.id ?? null]);
+  const loadedKey = useRef("");
   useEffect(() => {
     let alive = true;
-    setResult(null);
+    if (loadedKey.current !== queryKey) setResult(null);
     setError(false);
     if (app.store)
       void Promise.all([
@@ -30,12 +36,15 @@ export function useWaterReadings(tankId: string, active: boolean) {
           : Promise.resolve([]),
       ])
         .then(([latest, rows]) => {
-          if (alive)
+          if (alive) {
+            loadedKey.current = queryKey;
+            setCachedLatest({ tankId, values: latest });
             setResult({
               latest,
               history: rows.slice(0, 30),
               more: rows.length > 30,
             });
+          }
         })
         .catch(() => {
           if (alive) setError(true);
@@ -53,7 +62,8 @@ export function useWaterReadings(tankId: string, active: boolean) {
     app.clockTick,
   ]);
   return {
-    result,
+    latest: cachedLatest.tankId === tankId ? cachedLatest.values : [],
+    result: loadedKey.current === queryKey ? result : null,
     error,
     retry: () => setRetry((n) => n + 1),
     hasPrevious: cursors.length > 0,

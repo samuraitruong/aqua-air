@@ -3,7 +3,7 @@ import { totalTankVolume } from "../../src/domain/tank-volume";
 import { activityTitle } from "../../src/i18n";
 import { t as tr } from "../../src/i18n";
 import { useHistory } from "../../src/state/useHistory";
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { View, Alert, FlatList, Pressable } from "react-native";
 import { Text } from "../../src/ui/text";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -48,7 +48,33 @@ export default function Detail() {
   const [tab, setTab] = useState("history"),
     [filter, setFilter] = useState("all"),
     [showFilter, setShowFilter] = useState(false);
+  const listRef = useRef<FlatList>(null),
+    headerHeight = useRef(0),
+    jumpToWater = useRef(false);
   const measurements = useWaterReadings(id, tab === "water");
+  const scrollToWater = () =>
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() =>
+        listRef.current?.scrollToOffset({
+          offset: Math.max(0, headerHeight.current - 56),
+          animated: true,
+        }),
+      ),
+    );
+  const showWater = () => {
+    jumpToWater.current = true;
+    setTab("water");
+    if (tab === "water" && measurements.result) {
+      jumpToWater.current = false;
+      scrollToWater();
+    }
+  };
+  useEffect(() => {
+    if (tab === "water" && measurements.result && jumpToWater.current) {
+      jumpToWater.current = false;
+      scrollToWater();
+    }
+  }, [tab, measurements.result]);
   const page = useHistory(id, filter);
   const history = page.logs;
   if (!tank)
@@ -154,6 +180,9 @@ export default function Detail() {
     );
   const header = (
     <View
+      onLayout={(event) => {
+        headerHeight.current = event.nativeEvent.layout.height;
+      }}
       style={{
         gap: 16,
         marginBottom: 18,
@@ -230,11 +259,8 @@ export default function Detail() {
           </Card>
         </View>
       </View>
-      {measurements.result && (
-        <TankWaterSummary
-          values={measurements.result.latest}
-          onPress={() => setTab("water")}
-        />
+      {measurements.latest.length > 0 && (
+        <TankWaterSummary values={measurements.latest} onPress={showWater} />
       )}
       {!tank.archivedAt && (
         <Button
@@ -249,7 +275,7 @@ export default function Detail() {
           }
         />
       )}
-      {!tank.archivedAt && (
+      {!tank.archivedAt && tab !== "water" && (
         <Button
           title={tr("readings.log")}
           variant="secondary"
@@ -296,6 +322,7 @@ export default function Detail() {
       scroll={false}
     >
       <FlatList
+        ref={listRef}
         data={tab === "history" ? history : []}
         keyExtractor={(l) => l.id}
         initialNumToRender={10}

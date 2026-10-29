@@ -89,3 +89,10 @@ Top ten total-speaker languages plus Vietnamese are registered (VI stays default
 - TypeScript and 64 tests pass, including populated SQLite schema-3 → 4 migration, full-month aggregation beyond summary limits, local month boundaries, sump/archived tank handling, log edits/deletion, immutable capacity snapshots and backup compatibility.
 - iOS native: 156 L × AUD 4/1000 L = AUD 0.62; unit switch converts to AUD 0.004/L; rate survives restart. VND pricing and Arabic RTL verified. Temporary example rates cleared; Vietnamese restored.
 - Existing user tanks and histories retained. Unknown capacities visibly mark incomplete totals. Native Android visual testing remains unperformed; Android and iOS bundle exports succeed.
+
+### Water readings — 2026-10-29
+
+- Schema 5 adds tank-scoped custom parameters, measurement sessions and numeric values. Snapshot dashboard views omit reading history; latest-per-metric/history query full SQLite records with stable pagination.
+- 79 tests and typecheck cover partial/zero results, validation, archive/tank scoping, idempotency, edits/deletion/reset, populated schema-4 migration, format-3 round trips/count integrity and legacy format-2 normalization. Independent review found two timestamp edge cases; regression tests fail before and pass after canonicalization/timezone fixes.
+- Native iPhone16e QA install (separate from main iPhone17Pro data) verified pH range rejection, localized `7,2`, NO₂=0, NO₃, custom Dissolved oxygen mg/L, result display, persisted data after app restart, and edit without changing original measurement time. Visual inspection caught and fixed excessive grid card height.
+- iOS/Android JS bundle export passes; native Android visual QA and physical-device water-test flows remain unperformed.
