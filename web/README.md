@@ -16,4 +16,16 @@ npm run web:preview
 
 Open http://127.0.0.1:5501. The command binds to loopback only. Stop with Ctrl+C. Run `npm run web:check` to check local links, required contact details and page structure.
 
-After deploying, run `npm run release:check:links`; it deliberately fails before the public pages exist. No deployment has been performed as part of preparing this folder. Do not deploy repository files, signing keys, app data or source maps alongside the site.
+After deploying, run `npm run release:check:links`; it deliberately fails before the public pages exist. The GitHub Actions workflow deploys this folder after successful CI on the default branch; adding the workflow locally does not publish it until pushed/run. Do not deploy repository files, signing keys, app data or source maps alongside the site.
+
+## GitHub Pages deployment
+
+One-time repository setup: open **Settings → Pages → Build and deployment → Source**, then select **GitHub Actions**. The `github-pages` environment must allow deployments from your default branch (currently `main`).
+
+Push the workflow and site changes to `main`, or manually run CI on that branch. The deployment job waits for all tests, formatting and iOS/Android bundle exports to pass, then publishes only the `web/` artifact. Pull requests and feature branches never deploy. No extra repository secrets are required.
+
+Default site URL: https://samuraitruong.github.io/aqua-air/. All internal links are relative, so this project subpath works.
+
+To connect the domain already used by the app, first set **Settings → Pages → Custom domain** to `aquaair.truongthings.site`, then create a DNS CNAME record for `aquaair.truongthings.site` pointing to `samuraitruong.github.io` (no repository path). Enable **Enforce HTTPS** once the certificate is available. Until that is configured, the app's custom-domain privacy/support URLs will not resolve to this Pages site. No DNS or repository settings have been changed by editing this workflow.
+
+GitHub's official setup: [custom Pages workflows](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages), [custom domains](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site).

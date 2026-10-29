@@ -10,7 +10,8 @@ permissions:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  # Finish default-branch deployments; cancel superseded PR/feature validation.
+  cancel-in-progress: ${{ github.ref != format('refs/heads/{0}', github.event.repository.default_branch) }}
 
 jobs:
   test-and-build:
@@ -79,3 +80,29 @@ jobs:
             web/assets/
           if-no-files-found: error
           retention-days: 7
+
+      - name: Package website for GitHub Pages
+        if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: web/
+
+  deploy-website:
+    name: Deploy website to GitHub Pages
+    needs: test-and-build
+    if: github.event_name != 'pull_request' && github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Deploy website
+        id: deployment
+        uses: actions/deploy-pages@v4
