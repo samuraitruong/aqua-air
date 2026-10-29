@@ -76,7 +76,7 @@ jobs:
           name: aquaair-website
           path: |
             web/*.html
-            web/styles.css
+            web/*.css
             web/assets/
           if-no-files-found: error
           retention-days: 7

@@ -1,0 +1,858 @@
+/* Hallmark · landing redesign · product-led / calm editorial
+ * Audience: aquarium hobbyists · CTA: explore + launch enquiry · Theme: Aqua Air
+ * Pre-emit critique: P4 H5 E4 S5 R5 V4
+ */
+.landing {
+  --color-deep: #103f47;
+  --color-soft: #ecf5ee;
+  --color-lime: #d9e9bc;
+  --color-shadow: rgb(18 57 74 / 16%);
+  --space-section: 104px;
+}
+.landing .site-header,
+.landing main,
+.landing .site-footer {
+  width: min(1240px, calc(100% - 80px));
+}
+.landing-header {
+  padding-block: 24px;
+  border-bottom: 0;
+}
+.landing-header .brand {
+  font-size: 25px;
+}
+.landing-header nav {
+  gap: 30px;
+}
+.header-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 18px;
+  border: 1px solid var(--color-line);
+  border-radius: 100px;
+  padding: 9px 18px;
+  font-size: 14px;
+  font-weight: 650;
+  white-space: nowrap;
+  text-decoration: none;
+  min-height: 44px;
+}
+.landing-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 30px;
+  min-height: 730px;
+  padding-block: 40px 76px;
+}
+.availability {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 13px;
+  color: var(--color-accent);
+  font-weight: 650;
+  margin: 0 0 26px;
+}
+.availability > span {
+  width: 7px;
+  height: 7px;
+  background: var(--color-accent);
+  border-radius: 50%;
+}
+.landing h1 {
+  font-size: clamp(46px, 5.5vw, 77px);
+  line-height: 1.07;
+  letter-spacing: -0.06em;
+  font-weight: 720;
+  margin-bottom: 27px;
+}
+.landing h1 > span {
+  color: var(--color-accent);
+}
+.hero-description {
+  max-width: 490px;
+  font-size: 20px;
+  line-height: 1.7;
+  color: var(--color-muted);
+  margin: 0 0 31px;
+}
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px 25px;
+  flex-wrap: wrap;
+}
+.landing .button {
+  min-height: 54px;
+  border-radius: 13px;
+  gap: 22px;
+  padding: 15px 23px;
+  font-size: 15px;
+}
+.quiet-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  font-size: 14px;
+  font-weight: 650;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.quiet-link:hover {
+  text-decoration: underline;
+}
+.hero-footnote {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 25px;
+  color: var(--color-muted);
+}
+.hero-footnote svg {
+  width: 18px;
+  height: 18px;
+  color: var(--color-accent);
+  flex: none;
+}
+.hero-footnote p {
+  font-size: 12px;
+  margin: 0;
+}
+.hero-preview {
+  position: relative;
+  height: 640px;
+  min-width: 0;
+  margin: 0;
+}
+.preview-orbit {
+  position: absolute;
+  width: 96%;
+  aspect-ratio: 1;
+  background: var(--color-tint);
+  border-radius: 50%;
+  top: 80px;
+  left: 4%;
+}
+.preview-back,
+.preview-front {
+  position: absolute;
+  width: 46%;
+  border-radius: 25px;
+  overflow: hidden;
+  border: 1px solid var(--color-line);
+  box-shadow: 0 22px 50px var(--color-shadow);
+}
+.preview-back {
+  width: 44%;
+  height: auto;
+  left: 3%;
+  top: 78px;
+  transform: rotate(-7deg);
+}
+.preview-front {
+  right: 4%;
+  top: 12px;
+  transform: rotate(5deg);
+  display: block;
+}
+.preview-front img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.hero-preview figcaption {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+  font-size: 11px;
+  color: var(--color-muted);
+}
+.product-principles {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px 28px;
+  padding-block: 25px;
+  border-block: 1px solid var(--color-line);
+}
+.product-principles p {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 550;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.product-principles p > span {
+  font-size: 16px;
+  color: var(--color-accent);
+}
+.tank-story {
+  padding-block: var(--space-section);
+}
+.section-intro {
+  max-width: 750px;
+  margin-bottom: 50px;
+}
+.landing .eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  margin-bottom: 18px;
+}
+.landing h2 {
+  font-size: clamp(32px, 3.2vw, 47px);
+  line-height: 1.17;
+  letter-spacing: -0.045em;
+}
+.section-intro > p:last-child {
+  max-width: 510px;
+  font-size: 18px;
+  color: var(--color-muted);
+  margin: 0;
+}
+.tank-story-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 64px;
+  align-items: center;
+}
+.aquarium-scene {
+  position: relative;
+  margin: 0;
+  border-radius: 26px;
+  overflow: hidden;
+  min-height: 380px;
+  background: var(--color-deep);
+}
+.aquarium-scene img {
+  display: block;
+  width: 100%;
+  height: 330px;
+  object-fit: cover;
+  object-position: center;
+}
+.aquarium-scene figcaption {
+  padding: 20px 25px;
+  color: var(--color-paper);
+  font-size: 13px;
+}
+.feature-lines {
+  display: flex;
+  flex-direction: column;
+}
+.feature-lines article {
+  display: flex;
+  gap: 20px;
+  padding: 25px 0;
+  border-bottom: 1px solid var(--color-line);
+}
+.feature-lines article:first-child {
+  padding-top: 0;
+}
+.feature-lines article:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+.feature-number {
+  font-size: 12px;
+  color: var(--color-accent);
+  padding-top: 4px;
+  flex: none;
+}
+.landing h3 {
+  font-size: 21px;
+  line-height: 1.3;
+  letter-spacing: -0.025em;
+  margin-bottom: 10px;
+}
+.feature-lines p,
+.routine-points p {
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--color-muted);
+  margin: 0;
+}
+.routine-story {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 80px;
+  align-items: center;
+  padding: 70px 64px;
+  background: var(--color-tint);
+  border-radius: 32px;
+}
+.section-lead {
+  font-size: 18px;
+  color: var(--color-muted);
+  margin: 0 0 28px;
+}
+.routine-points {
+  border-top: 1px solid var(--color-line);
+}
+.routine-points article {
+  padding-top: 22px;
+}
+.routine-points h3 {
+  font-size: 17px;
+  margin-bottom: 5px;
+}
+.calendar-preview {
+  position: relative;
+  margin: 0;
+  min-height: 610px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 15px;
+}
+.calendar-backdrop {
+  position: absolute;
+  inset: 50px -20px 60px;
+  border-radius: 100% 100% 45% 45%;
+  background: var(--color-bg);
+}
+.calendar-preview > a {
+  display: block;
+  position: relative;
+  max-width: 265px;
+  width: 82%;
+  border: 1px solid var(--color-line);
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 20px 45px var(--color-shadow);
+  transform: rotate(3deg);
+}
+.calendar-preview img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.calendar-preview figcaption {
+  position: relative;
+  font-size: 11px;
+  color: var(--color-muted);
+}
+.local-first {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1.3fr) minmax(0, 0.8fr);
+  gap: 32px;
+  padding-block: var(--space-section);
+  align-items: start;
+}
+.privacy-mark {
+  width: 62px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-soft);
+  color: var(--color-accent);
+  border-radius: 22px;
+}
+.privacy-mark svg {
+  width: 35px;
+  height: 35px;
+}
+.local-first h2 {
+  font-size: 35px;
+}
+.local-first p:not(.eyebrow) {
+  color: var(--color-muted);
+  font-size: 16px;
+}
+.local-first aside {
+  padding: 24px 0 0 35px;
+  border-left: 1px solid var(--color-line);
+  margin-left: 20px;
+}
+.local-first aside .language-note {
+  font-weight: 650;
+  color: var(--color-ink);
+  font-size: 17px;
+  margin-top: 0;
+}
+.local-first aside > p:last-child {
+  font-size: 14px;
+  line-height: 2;
+}
+.launch-section {
+  text-align: center;
+  background: var(--color-deep);
+  color: var(--color-paper);
+  border-radius: 30px;
+  padding: 65px 30px 55px;
+}
+.launch-section .eyebrow {
+  color: var(--color-lime);
+}
+.launch-section h2 {
+  font-size: clamp(34px, 4vw, 52px);
+  margin-bottom: 23px;
+}
+.launch-section > p:not(.eyebrow):not(.launch-note) {
+  max-width: 500px;
+  margin: 0 auto 30px;
+  color: var(--color-tint);
+  font-size: 17px;
+}
+.launch-section .button {
+  background: var(--color-paper);
+  color: var(--color-deep);
+}
+.launch-section .button:hover {
+  background: var(--color-lime);
+}
+.launch-section .launch-note {
+  font-size: 11px;
+  color: var(--color-tint);
+  margin: 16px 0 0;
+}
+.product-notes {
+  max-width: 760px;
+  margin: 24px auto 66px;
+  text-align: center;
+  font-size: 11px;
+  line-height: 1.8;
+  color: var(--color-muted);
+}
+.landing-footer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  padding-block: 32px;
+}
+.landing-footer .brand {
+  font-size: 20px;
+}
+.landing-footer > div > p {
+  font-size: 12px;
+  color: var(--color-muted);
+  margin: 12px 0 0;
+}
+.landing-footer nav {
+  align-items: center;
+  gap: 24px;
+  margin: 0;
+}
+.landing-footer > .fine {
+  grid-column: 1/-1;
+  font-size: 11px;
+  margin: 0;
+}
+.preview-front,
+.calendar-preview > a {
+  transition: transform 0.2s ease;
+}
+.preview-front:hover {
+  transform: rotate(2deg) translateY(-4px);
+}
+.calendar-preview > a:hover {
+  transform: rotate(0);
+}
+@media (min-width: 1440px) {
+  .hero-preview {
+    height: 650px;
+  }
+  .preview-back {
+    top: 80px;
+  }
+  .preview-front {
+    top: 5px;
+  }
+}
+@media (max-width: 1100px) {
+  .landing .site-header,
+  .landing main,
+  .landing .site-footer {
+    width: calc(100% - 64px);
+  }
+  .landing-header nav {
+    gap: 19px;
+  }
+  .landing-hero {
+    min-height: 650px;
+    gap: 15px;
+  }
+  .hero-preview {
+    height: 560px;
+  }
+  .preview-back {
+    left: 0;
+    top: 85px;
+    width: 44%;
+  }
+  .preview-front {
+    right: 2%;
+    top: 40px;
+    width: 49%;
+  }
+  .hero-description {
+    font-size: 18px;
+  }
+  .hero-actions {
+    gap: 10px 18px;
+  }
+  .routine-story {
+    gap: 40px;
+    padding: 55px 40px;
+  }
+  .calendar-preview {
+    min-height: 540px;
+  }
+  .tank-story-layout {
+    gap: 40px;
+  }
+  .local-first {
+    grid-template-columns: 60px minmax(0, 1fr);
+    gap: 25px;
+  }
+  .local-first aside {
+    grid-column: 2;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+  .landing-footer {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .landing-footer nav {
+    gap: 25px;
+  }
+}
+@media (max-width: 800px) {
+  .landing {
+    --space-section: 72px;
+  }
+  .landing-header .header-cta {
+    display: none;
+  }
+  .landing-hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+    padding-top: 45px;
+    padding-bottom: 48px;
+  }
+  .hero-copy {
+    max-width: 610px;
+  }
+  .landing h1 {
+    font-size: clamp(46px, 7.3vw, 65px);
+  }
+  .hero-description {
+    max-width: 530px;
+  }
+  .hero-preview {
+    width: 490px;
+    max-width: 100%;
+    height: 570px;
+    justify-self: center;
+  }
+  .preview-back {
+    width: 44%;
+    left: 8%;
+    top: 90px;
+  }
+  .preview-front {
+    width: 46%;
+    right: 7%;
+    top: 14px;
+  }
+  .preview-orbit {
+    width: 87%;
+    left: 6%;
+    top: 65px;
+  }
+  .hero-preview figcaption {
+    bottom: 0;
+  }
+  .product-principles {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 20px;
+  }
+  .tank-story-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 35px;
+  }
+  .aquarium-scene {
+    min-height: 0;
+  }
+  .aquarium-scene img {
+    height: 320px;
+  }
+  .routine-story {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+    padding: 45px 36px;
+  }
+  .calendar-preview {
+    min-height: 565px;
+  }
+  .calendar-backdrop {
+    inset: 45px 10% 50px;
+  }
+  .calendar-preview > a {
+    width: 245px;
+    max-width: 80%;
+  }
+  .section-intro {
+    margin-bottom: 35px;
+  }
+  .feature-lines article {
+    padding: 22px 0;
+  }
+  .local-first h2 {
+    font-size: 31px;
+  }
+  .launch-section {
+    padding: 55px 30px 45px;
+  }
+}
+@media (max-width: 600px) {
+  .landing .site-header,
+  .landing main,
+  .landing .site-footer {
+    width: calc(100% - 40px);
+  }
+  .landing-header {
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding-block: 20px;
+  }
+  .landing-header nav {
+    gap: 20px;
+  }
+  .landing-header nav a {
+    font-size: 13px;
+  }
+  .landing-header .brand {
+    font-size: 22px;
+  }
+  .landing-header .brand img {
+    width: 35px;
+    height: 35px;
+    border-radius: 10px;
+  }
+  .landing-hero {
+    padding-top: 33px;
+    padding-bottom: 38px;
+  }
+  .availability {
+    font-size: 12px;
+    margin-bottom: 22px;
+  }
+  .landing h1 {
+    font-size: clamp(39px, 8.8vw, 52px);
+    line-height: 1.1;
+    margin-bottom: 23px;
+  }
+  .hero-description {
+    font-size: 17px;
+    line-height: 1.75;
+  }
+  .hero-actions {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 7px;
+  }
+  .landing .button {
+    min-height: 51px;
+    padding: 13px 21px;
+    font-size: 14px;
+  }
+  .quiet-link {
+    font-size: 13px;
+  }
+  .hero-footnote {
+    margin-top: 18px;
+    gap: 8px;
+  }
+  .hero-footnote p {
+    font-size: 11px;
+  }
+  .hero-preview {
+    height: 480px;
+    width: 390px;
+    margin-top: 6px;
+  }
+  .preview-front {
+    width: 49%;
+    right: 5%;
+    top: 18px;
+    border-radius: 18px;
+  }
+  .preview-back {
+    width: 47%;
+    left: 5%;
+    top: 85px;
+    border-radius: 18px;
+  }
+  .preview-orbit {
+    top: 80px;
+    width: 94%;
+    left: 2%;
+  }
+  .hero-preview figcaption {
+    font-size: 10px;
+    bottom: 3px;
+  }
+  .product-principles {
+    padding-block: 22px;
+    gap: 16px 12px;
+  }
+  .product-principles p {
+    font-size: 11px;
+    gap: 7px;
+  }
+  .product-principles p > span {
+    font-size: 13px;
+  }
+  .landing .eyebrow {
+    font-size: 10px;
+  }
+  .landing h2 {
+    font-size: 32px;
+  }
+  .section-intro > p:last-child {
+    font-size: 16px;
+  }
+  .aquarium-scene {
+    border-radius: 21px;
+  }
+  .aquarium-scene img {
+    height: 220px;
+  }
+  .aquarium-scene figcaption {
+    font-size: 11px;
+    padding: 16px 20px;
+  }
+  .feature-lines article {
+    gap: 16px;
+  }
+  .landing h3 {
+    font-size: 20px;
+  }
+  .routine-story {
+    border-radius: 24px;
+    padding: 35px 23px;
+  }
+  .routine-story h2 {
+    font-size: 30px;
+  }
+  .section-lead {
+    font-size: 16px;
+  }
+  .routine-points h3 {
+    font-size: 17px;
+  }
+  .routine-points p {
+    font-size: 14px;
+  }
+  .calendar-preview {
+    min-height: 535px;
+  }
+  .calendar-preview > a {
+    width: 222px;
+    border-radius: 21px;
+    max-width: 90%;
+  }
+  .calendar-backdrop {
+    inset: 40px -5px 50px;
+  }
+  .local-first {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+  .local-first aside {
+    grid-column: auto;
+    padding-top: 20px;
+    border-top: 1px solid var(--color-line);
+  }
+  .local-first h2 {
+    font-size: 31px;
+  }
+  .privacy-mark {
+    width: 54px;
+    height: 62px;
+    border-radius: 18px;
+  }
+  .local-first p:not(.eyebrow) {
+    font-size: 15px;
+  }
+  .launch-section {
+    padding: 43px 22px 35px;
+    border-radius: 24px;
+  }
+  .launch-section h2 {
+    font-size: 33px;
+  }
+  .launch-section > p:not(.eyebrow):not(.launch-note) {
+    font-size: 15px;
+  }
+  .launch-section .launch-note {
+    font-size: 10px;
+  }
+  .product-notes {
+    font-size: 10px;
+    margin-bottom: 45px;
+  }
+  .landing-footer nav {
+    gap: 15px;
+  }
+  .landing-footer nav a {
+    font-size: 12px;
+  }
+  .landing-footer .fine {
+    font-size: 10px;
+  }
+}
+@media (max-width: 375px) {
+  .hero-preview {
+    height: 440px;
+  }
+  .preview-back {
+    top: 75px;
+  }
+  .hero-footnote p {
+    font-size: 10px;
+  }
+  .landing h1 {
+    font-size: clamp(36px, 9vw, 43px);
+  }
+  .landing-header nav {
+    gap: 18px;
+  }
+  .landing h2 {
+    font-size: 29px;
+  }
+  .routine-story {
+    padding-inline: 20px;
+  }
+  .calendar-preview {
+    min-height: 490px;
+  }
+  .calendar-preview > a {
+    width: 203px;
+  }
+  .launch-section h2 {
+    font-size: 29px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .preview-front,
+  .calendar-preview > a {
+    transition: none;
+  }
+  .preview-front:hover {
+    transform: rotate(5deg);
+  }
+  .calendar-preview > a:hover {
+    transform: rotate(3deg);
+  }
+}

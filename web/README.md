@@ -29,3 +29,9 @@ Default site URL: https://samuraitruong.github.io/aqua-air/. All internal links 
 To connect the domain already used by the app, first set **Settings → Pages → Custom domain** to `aquaair.truongthings.site`, then create a DNS CNAME record for `aquaair.truongthings.site` pointing to `samuraitruong.github.io` (no repository path). Enable **Enforce HTTPS** once the certificate is available. Until that is configured, the app's custom-domain privacy/support URLs will not resolve to this Pages site. No DNS or repository settings have been changed by editing this workflow.
 
 GitHub's official setup: [custom Pages workflows](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages), [custom domains](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site).
+
+## Landing page content
+
+The product landing page loads `styles.css` and scoped `landing.css`; privacy/support continue using the shared document layout. Dashboard, tank and calendar images in `assets/app-*.png`, plus `assets/aquarium.png`, were captured from the original `Design/screens/` preview without changing those design files. They are labelled as design previews and contain sample design data, not user records.
+
+There are no store listing URLs yet. “Explore the app” links to the feature section; launch enquiry CTAs open an email draft addressed to the publisher. No signup, subscription or message is sent automatically. Once store listings exist, replace or extend those CTAs with the real destinations and remove the prelaunch label.

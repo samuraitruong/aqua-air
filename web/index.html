@@ -5,116 +5,300 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="Aqua Air is an offline aquarium-care journal with tank records, care history, optional reminders and water-use estimates."
+      content="More time enjoying your aquarium. Aqua Air keeps tank care, water tests and reminders together in a private, offline journal. Coming to iOS and Android."
     />
-    <meta name="theme-color" content="#087F8C" />
-    <title>An aquarium journal, close at hand · Aqua Air</title>
+    <meta name="theme-color" content="#087f8c" />
+    <meta
+      property="og:title"
+      content="Aqua Air — more time enjoying your aquarium"
+    />
+    <meta
+      property="og:description"
+      content="Your tanks, water tests and care routine, all in one little journal. Coming to iOS and Android."
+    />
+    <meta property="og:type" content="website" />
+    <title>Aqua Air · A little care. A whole underwater world.</title>
     <link rel="icon" href="assets/icon.png" />
     <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="landing.css" />
     <link rel="canonical" href="https://aquaair.truongthings.site/" />
   </head>
-  <body>
+  <body class="landing">
     <a class="skip" href="#main">Skip to content</a>
-    <header class="site-header">
-      <a class="brand" href="index.html"
-        ><img src="assets/icon.png" width="42" height="42" alt="" /><span
+    <header class="site-header landing-header">
+      <a class="brand" href="index.html" aria-label="Aqua Air home"
+        ><img src="assets/icon.png" width="40" height="40" alt="" /><span
           >Aqua Air</span
         ></a
       >
       <nav aria-label="Main navigation">
-        <a href="index.html" aria-current="page">Overview</a
-        ><a href="privacy.html">Privacy</a><a href="support.html">Support</a>
+        <a href="#explore">The app</a><a href="#your-routine">Your routine</a
+        ><a href="support.html">Support</a>
       </nav>
+      <a
+        class="header-cta"
+        href="mailto:samuraitruong@hotmail.com?subject=Aqua%20Air%20launch%20enquiry"
+        >Ask about launch <span aria-hidden="true">↗</span></a
+      >
     </header>
     <main id="main">
-      <section class="intro">
-        <div>
-          <p class="eyebrow">Your aquarium journal</p>
-          <h1>A little care.<br />A clearer record.</h1>
-          <p class="lead">
-            Keep track of your tanks, the water you change, and the care that
-            comes next. Aqua Air keeps your journal on your device.
+      <section class="landing-hero" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <p class="availability">
+            <span aria-hidden="true"></span> Coming to iOS &amp; Android
           </p>
-          <a class="button" href="support.html"
-            >Get help with Aqua Air <span aria-hidden="true">↗</span></a
+          <h1 id="hero-title">
+            Less remembering.<br /><span>More enjoying.</span>
+          </h1>
+          <p class="hero-description">
+            A little journal for your whole underwater world. Keep your tanks,
+            water tests and care routine together, so you can get back to the
+            view.
+          </p>
+          <div class="hero-actions">
+            <a class="button" href="#explore"
+              >Explore the app <span aria-hidden="true">↓</span></a
+            ><a
+              class="quiet-link"
+              href="mailto:samuraitruong@hotmail.com?subject=Aqua%20Air%20launch%20enquiry"
+              >Ask about the launch <span aria-hidden="true">↗</span></a
+            >
+          </div>
+          <div class="hero-footnote">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.6"
+              aria-hidden="true"
+            >
+              <path d="M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6l-8-3Z" />
+              <path d="m8.5 12 2.3 2.3 4.7-4.6" />
+            </svg>
+            <p>No account. No ads. Just your aquarium.</p>
+          </div>
+        </div>
+        <figure class="hero-preview">
+          <div class="preview-orbit" aria-hidden="true"></div>
+          <img
+            class="preview-back"
+            src="assets/app-tank.png"
+            width="430"
+            height="880"
+            alt="Aqua Air tank detail design showing an aquarium photo and care history"
+          />
+          <a
+            class="preview-front"
+            href="assets/app-dashboard.png"
+            aria-label="View larger Aqua Air dashboard design"
+            ><img
+              src="assets/app-dashboard.png"
+              width="430"
+              height="880"
+              alt="Aqua Air dashboard design with care tasks, upcoming reminders and navigation"
+              fetchpriority="high"
+          /></a>
+          <figcaption>From the app design · Vietnamese interface</figcaption>
+        </figure>
+      </section>
+      <div class="product-principles" aria-label="App essentials">
+        <p><span aria-hidden="true">✓</span> Works offline</p>
+        <p><span aria-hidden="true">✓</span> Your data, on your device</p>
+        <p><span aria-hidden="true">✓</span> 11 languages</p>
+        <p><span aria-hidden="true">✓</span> Exportable backups</p>
+      </div>
+      <section
+        class="tank-story"
+        id="explore"
+        aria-labelledby="tank-story-title"
+      >
+        <div class="section-intro">
+          <p class="eyebrow">Made for your little ecosystem</p>
+          <h2 id="tank-story-title">
+            Every tank has a story.<br />Keep yours close.
+          </h2>
+          <p>
+            From the first fill to the next water change, give every tank a
+            place of its own.
+          </p>
+        </div>
+        <div class="tank-story-layout">
+          <figure class="aquarium-scene">
+            <img
+              src="assets/aquarium.png"
+              width="430"
+              height="220"
+              loading="lazy"
+              alt="A lush planted aquarium with small fish, taken from the Aqua Air design"
+            />
+            <figcaption>A planted world. A routine worth keeping.</figcaption>
+          </figure>
+          <div class="feature-lines">
+            <article>
+              <span class="feature-number" aria-hidden="true">01</span>
+              <div>
+                <h3>Start with the tank.</h3>
+                <p>
+                  Photos, dimensions, water type and filters, together. Add a
+                  sump or canister and calculate capacity from the tank’s
+                  measurements.
+                </p>
+              </div>
+            </article>
+            <article>
+              <span class="feature-number" aria-hidden="true">02</span>
+              <div>
+                <h3>Keep the small details.</h3>
+                <p>
+                  Record pH, nutrients and other water tests with dates and
+                  notes. Add your own parameters and units when your test kit
+                  needs them.
+                </p>
+              </div>
+            </article>
+            <article>
+              <span class="feature-number" aria-hidden="true">03</span>
+              <div>
+                <h3>See what changed.</h3>
+                <p>
+                  Look back at care history and the latest result for each
+                  parameter. Your records stay with the tank, ready when you
+                  need them.
+                </p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+      <section
+        class="routine-story"
+        id="your-routine"
+        aria-labelledby="routine-title"
+      >
+        <div class="routine-copy">
+          <p class="eyebrow">A rhythm, not a mental checklist</p>
+          <h2 id="routine-title">
+            The next little thing.<br />Already in view.
+          </h2>
+          <p class="section-lead">
+            Water changes. Filter cleaning. A quick note after testing. Give
+            everyday care a little structure.
+          </p>
+          <div class="routine-points">
+            <article>
+              <h3>Know what’s next</h3>
+              <p>
+                See care tasks in one calendar and choose optional local
+                reminders for the routines you want to keep.
+              </p>
+            </article>
+            <article>
+              <h3>Make each change count</h3>
+              <p>
+                Log completed water changes and see a monthly estimate of litres
+                replaced and cost at your chosen water rate.
+              </p>
+            </article>
+            <article>
+              <h3>Pick up where you left off</h3>
+              <p>
+                Keep history on your device and export an
+                <code>.aquaair</code> backup when you need a copy or move to a
+                new phone.
+              </p>
+            </article>
+          </div>
+        </div>
+        <figure class="calendar-preview">
+          <div class="calendar-backdrop" aria-hidden="true"></div>
+          <a
+            href="assets/app-calendar.png"
+            aria-label="View larger Aqua Air calendar design"
+            ><img
+              src="assets/app-calendar.png"
+              width="430"
+              height="880"
+              loading="lazy"
+              alt="Aqua Air calendar design showing upcoming aquarium care and recorded activities"
+          /></a>
+          <figcaption>Calendar design preview</figcaption>
+        </figure>
+      </section>
+      <section class="local-first" aria-labelledby="local-title">
+        <div class="privacy-mark" aria-hidden="true">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.4"
+          >
+            <path d="M12 3 4 6v6c0 5 8 9 8 9s8-4 8-9V6l-8-3Z" />
+            <path d="m8.5 12 2.3 2.3 4.7-4.6" />
+          </svg>
+        </div>
+        <div>
+          <p class="eyebrow">A quiet place for your records</p>
+          <h2 id="local-title">Your hobby. Your journal.</h2>
+          <p>
+            Aqua Air works without an account, advertising or a developer-hosted
+            cloud service. Your journal lives in local app storage. You choose
+            when and where to export it.
+          </p>
+          <a class="quiet-link" href="privacy.html"
+            >How your data is handled <span aria-hidden="true">↗</span></a
           >
         </div>
-        <aside class="app-note" aria-label="About the app">
-          <img
-            src="assets/icon.png"
-            width="96"
-            height="96"
-            alt="Aqua Air droplet icon"
-          />
-          <h2>Made for everyday care</h2>
-          <dl>
-            <div>
-              <dt>Platforms</dt>
-              <dd>iPhone &amp; Android</dd>
-            </div>
-            <div>
-              <dt>Your records</dt>
-              <dd>Stored on your device</dd>
-            </div>
-            <div>
-              <dt>Account</dt>
-              <dd>No sign-in needed</dd>
-            </div>
-            <div>
-              <dt>Publisher</dt>
-              <dd>Truong Nguyen</dd>
-            </div>
-          </dl>
+        <aside>
+          <p class="language-note">Make yourself at home.</p>
+          <p>
+            Vietnamese · English · Chinese · Hindi · Spanish · Arabic · French ·
+            Bengali · Portuguese · Indonesian · Urdu
+          </p>
         </aside>
       </section>
-      <section class="feature-notes">
-        <p class="eyebrow">Inside Aqua Air</p>
-        <h2>A record for every tank.</h2>
-        <div class="note-grid">
-          <p>
-            Set a tank’s dimensions to calculate its capacity. Include a sump
-            and canister filter, and keep your care history alongside each tank.
-          </p>
-          <p>
-            Record water-test results such as pH and nutrients, with custom
-            parameters and units when needed. Log completed water changes, plan
-            care and choose optional local reminders. The monthly water estimate
-            shows recorded replacement water and its cost at your configured
-            rate.
-          </p>
-          <p>
-            Use the app in Vietnamese, English, Chinese, Hindi, Spanish, Arabic,
-            French, Bengali, Portuguese, Indonesian or Urdu. Export a backup
-            when you want a copy of your records.
-          </p>
-        </div>
-        <p class="fine">
-          Water estimates exclude top-ups, filter waste and fixed utility
-          charges. Reminder delivery depends on your phone settings.
+      <section
+        class="launch-section"
+        id="launch"
+        aria-labelledby="launch-title"
+      >
+        <p class="eyebrow">Aqua Air · Coming to iOS &amp; Android</p>
+        <h2 id="launch-title">
+          A little less admin.<br />A little more aquarium.
+        </h2>
+        <p>
+          Something you’d love to see in your aquarium journal? Want to hear
+          about the launch? Say hello to Truong.
+        </p>
+        <a
+          class="button"
+          href="mailto:samuraitruong@hotmail.com?subject=Aqua%20Air%20launch%20enquiry"
+          >Ask about the launch <span aria-hidden="true">↗</span></a
+        >
+        <p class="launch-note">
+          Opens your email app. No signup or automatic subscription.
         </p>
       </section>
-      <section class="contact-strip">
-        <div>
-          <h2>Clear answers, in one place.</h2>
-          <p>
-            How your data is handled, how backups work, and how to reach the
-            publisher.
-          </p>
-        </div>
-        <div class="text-links">
-          <a href="privacy.html">Read the privacy policy →</a
-          ><a href="support.html">Find help &amp; contact →</a>
-        </div>
-      </section>
+      <p class="product-notes">
+        App images are original design previews. Water-use estimates exclude
+        top-ups, filter waste and fixed utility charges. Reminder delivery
+        depends on your device settings.
+      </p>
     </main>
-    <footer class="site-footer">
-      <p>Aqua Air, by Truong Nguyen</p>
+    <footer class="site-footer landing-footer">
+      <div>
+        <a class="brand" href="index.html"
+          ><img src="assets/icon.png" width="32" height="32" alt="" /><span
+            >Aqua Air</span
+          ></a
+        >
+        <p>A little care. A whole underwater world.</p>
+      </div>
       <nav aria-label="Footer">
         <a href="privacy.html">Privacy policy</a
-        ><a href="support.html">Support</a
+        ><a href="support.html">Help &amp; support</a
         ><a href="mailto:samuraitruong@hotmail.com">Email Truong</a>
       </nav>
-      <p class="fine">Aquarium care, kept on your device.</p>
+      <p class="fine">Made by Truong Nguyen.</p>
     </footer>
   </body>
 </html>

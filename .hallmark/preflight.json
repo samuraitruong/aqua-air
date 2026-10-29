@@ -1,0 +1,10 @@
+{
+  "scope": "web landing page",
+  "date": "2026-10-30",
+  "framework": "buildless HTML/CSS",
+  "font": "existing system-ui stack in web/styles.css",
+  "palette": ["#F4FAFB", "#12394A", "#087F8C", "#E6F5F8"],
+  "motion": "no motion library; respect reduced-motion",
+  "preserve": ["Aqua Air branding", "privacy/support routes", "publisher identity", "relative links for GitHub Pages"],
+  "introduce": ["product-led hero", "original design screenshots", "working prelaunch CTAs", "editorial feature sections"]
+}
