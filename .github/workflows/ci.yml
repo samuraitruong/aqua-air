@@ -21,8 +21,6 @@ jobs:
       CI: "1"
       EXPO_NO_TELEMETRY: "1"
       EXPO_OFFLINE: "1"
-      # Expo/Metro uses os.tmpdir()/metro-cache.
-      TMPDIR: ${{ runner.temp }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
@@ -58,6 +56,9 @@ jobs:
 
       # Bundle validation only: no native signing, Expo account or store secrets.
       - name: Export iOS and Android bundles
+        env:
+          # runner is available in step env; keep Metro aligned with the cached path.
+          TMPDIR: ${{ runner.temp }}
         run: npx expo export --platform ios --platform android --output-dir dist
 
       - name: Upload app bundles
