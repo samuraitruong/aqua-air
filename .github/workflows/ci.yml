@@ -20,6 +20,7 @@ jobs:
     env:
       CI: "1"
       EXPO_NO_TELEMETRY: "1"
+      EXPO_OFFLINE: "1"
       # Expo/Metro uses os.tmpdir()/metro-cache.
       TMPDIR: ${{ runner.temp }}
     steps:
