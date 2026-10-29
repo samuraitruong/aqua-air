@@ -1,0 +1,9 @@
+# Per-tank water readings
+
+User selected built-in metrics plus custom parameters/units. Implement a dated measurement session with optional values and notes. Built-ins: pH, temperature, NH3, NH4+, NO2, NO3, GH, KH, TDS, PO4 and salinity. Built-in units are explicit; custom definitions belong to a tank, are reusable and retain their name/unit in saved values. No chemical conversion or generic health thresholds.
+
+Tank detail gains a Water parameters tab, latest-per-parameter values with their own measured date/time and a paginated list of measurement sessions. Add, edit and delete sessions with confirmation; archived tanks remain readable but cannot add/edit. Empty, loading, failure/retry and missing records are handled in the established teal design. Each save needs at least one numeric value; zero is valid. pH is 0–14, other concentration/hardness/salinity values nonnegative; custom values may be negative. Numeric keyboard input accepts existing localized-digit parsing. Date/time uses selected locale; editing unchanged local date/time preserves original timestamp across timezone changes.
+
+Use SQLite version 5: custom parameters, reading sessions and reading values. Keep ordinary dashboard snapshots bounded: only custom definitions are included there; query latest values/history directly from SQL. New history does not reset care schedules or affect replacement-water usage. Reuse Store.write serialization/idempotency and transactional deletion/reset.
+
+Backups write format 3 with counts and all measurement tables; restore formats 1/2 with empty measurement tables. An older app must reject format 3 instead of silently losing measurements. Backups validate metric types, units, relationships, duplicate values/keys, timestamps and finite ranges. Eleven language catalogs receive matching keys; user-defined names remain unchanged.

@@ -16,6 +16,7 @@ import {
 } from "../domain/validation";
 import { isDate, normalize, isTimestamp } from "../domain/dates";
 import { validateWaterRate } from "../domain/water-usage";
+import { validateWaterData } from "./water-reading-validation";
 const MB = 1024 * 1024,
   uuid =
     /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -33,6 +34,9 @@ export interface Manifest {
     logs: number;
     schedules: number;
     photos: number;
+    waterReadings?: number;
+    waterParameters?: number;
+    waterValues?: number;
   };
   files: {
     path: string;
@@ -75,6 +79,7 @@ export function validateData(input: unknown): asserts input is AppData {
     }
     return set;
   };
+  validateWaterData(d);
   const tanks = ids(d.tanks),
     photos = ids(d.photos),
     schedules = ids(d.schedules);
@@ -299,7 +304,7 @@ export function encodeBackup(
   data.tanks = data.tanks.map((tank) => validateTank(tank));
   files["data.json"] = strToU8(JSON.stringify(data));
   const manifest: Manifest = {
-    formatVersion: 2,
+    formatVersion: 3,
     appVersion: "1.0.0",
     exportedAt,
     counts: {
@@ -307,6 +312,9 @@ export function encodeBackup(
       logs: data.logs.length,
       schedules: data.schedules.length,
       photos: data.photos.length,
+      waterReadings: data.waterReadings.length,
+      waterParameters: data.waterParameters.length,
+      waterValues: data.waterValues.length,
     },
     files: Object.entries(files).map(([path, b]) => ({
       path,
@@ -367,7 +375,7 @@ export function decodeBackup(bytes: Uint8Array): BackupPreview {
   );
   const manifest = JSON.parse(strFromU8(files["manifest.json"])) as Manifest;
   requireValue(
-    manifest.formatVersion === 1 || manifest.formatVersion === 2,
+    [1, 2, 3].includes(manifest.formatVersion),
     tr("messages.thisBackupVersionIsNotSupported"),
   );
   requireValue(
@@ -393,7 +401,29 @@ export function decodeBackup(bytes: Uint8Array): BackupPreview {
   );
   const data: unknown = JSON.parse(strFromU8(files["data.json"]));
   validateData(data);
-  if (manifest.formatVersion === 2)
+  if (manifest.formatVersion === 3)
+    requireValue(
+      Array.isArray(data.waterReadings) &&
+        Array.isArray(data.waterParameters) &&
+        Array.isArray(data.waterValues) &&
+        manifest.counts?.waterReadings === data.waterReadings.length &&
+        manifest.counts?.waterParameters === data.waterParameters.length &&
+        manifest.counts?.waterValues === data.waterValues.length,
+      tr("validation.theRecordCountsDoNotMatch"),
+    );
+  else
+    requireValue(
+      !(
+        data.waterReadings?.length ||
+        data.waterParameters?.length ||
+        data.waterValues?.length
+      ),
+      tr("readings.invalid"),
+    );
+  data.waterParameters ??= [];
+  data.waterReadings ??= [];
+  data.waterValues ??= [];
+  if (manifest.formatVersion >= 2)
     for (const tank of data.tanks)
       for (const field of [
         "lengthCm",

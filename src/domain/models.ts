@@ -116,7 +116,43 @@ export interface Settings {
   notificationError: import("../i18n").MessageKey | null;
   budgetExceeded: boolean;
 }
+export interface WaterParameter {
+  id: string;
+  tankId: string;
+  name: string;
+  unit: string;
+  createdAt: string;
+  updatedAt: string;
+}
+export interface WaterReading {
+  id: string;
+  tankId: string;
+  performedAt: string;
+  performedLocalDate: string;
+  notes: string;
+  idempotencyKey: string;
+  createdAt: string;
+  updatedAt: string;
+}
+export interface WaterValue {
+  id: string;
+  readingId: string;
+  parameterKey: string;
+  nameSnapshot: string;
+  unitSnapshot: string;
+  value: number;
+}
+export interface WaterReadingWithValues extends WaterReading {
+  values: WaterValue[];
+}
+export interface LatestWaterValue extends WaterValue {
+  performedAt: string;
+  performedLocalDate: string;
+}
 export interface AppData {
+  waterParameters: WaterParameter[];
+  waterReadings: WaterReading[];
+  waterValues: WaterValue[];
   tanks: Tank[];
   photos: Photo[];
   schedules: Schedule[];
@@ -127,6 +163,9 @@ export interface AppData {
   settings: Settings;
 }
 export const emptyData = (): AppData => ({
+  waterParameters: [],
+  waterReadings: [],
+  waterValues: [],
   tanks: [],
   photos: [],
   schedules: [],

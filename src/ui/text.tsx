@@ -30,7 +30,8 @@ export const TextInput = forwardRef<NativeTextInput, TextInputProps>(
     const numeric =
       props.keyboardType === "number-pad" ||
       props.keyboardType === "decimal-pad" ||
-      props.keyboardType === "numeric";
+      props.keyboardType === "numeric" ||
+      props.keyboardType === "numbers-and-punctuation";
     return (
       <NativeTextInput
         {...props}

@@ -118,6 +118,7 @@ export default function Backup() {
           [
             [app.data.tanks.length, "counts.tanks", "grid"],
             [app.totalLogs, "counts.activities", "file-text"],
+            [app.totalReadings, "readings.count", "activity"],
             [app.data.schedules.length, "counts.schedules", "calendar"],
             [app.data.photos.length, "counts.photos", "image"],
           ] as const
@@ -205,6 +206,11 @@ export default function Backup() {
             {preview.manifest.counts.schedules}
             {tr("messages.schedules")} {preview.manifest.counts.photos}
             {tr("messages.photos")}
+          </Text>
+          <Text style={s.body}>
+            {tr("readings.count", {
+              0: preview.manifest.counts.waterReadings ?? 0,
+            })}
           </Text>
           <Banner text={tr("messages.yourCurrentDataWillBeReplacedYouCan")} />
           <Button

@@ -397,6 +397,12 @@ export class CareService {
       const ids = new Set(
         d.schedules.filter((s) => s.tankId === id).map((s) => s.id),
       );
+      const waterIds = new Set(
+        d.waterReadings.filter((r) => r.tankId === id).map((r) => r.id),
+      );
+      d.waterValues = d.waterValues.filter((v) => !waterIds.has(v.readingId));
+      d.waterReadings = d.waterReadings.filter((r) => r.tankId !== id);
+      d.waterParameters = d.waterParameters.filter((p) => p.tankId !== id);
       d.logs = d.logs.filter((l) => l.tankId !== id);
       d.reminders = d.reminders.filter((r) => !ids.has(r.scheduleId));
       d.jobs = d.jobs.filter((j) => !ids.has(j.scheduleId));

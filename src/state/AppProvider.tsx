@@ -14,6 +14,7 @@ import { randomUUID } from "expo-crypto";
 import * as Haptics from "expo-haptics";
 import { openStore } from "../repositories/native";
 import type { SqlStore } from "../repositories/store";
+import { WaterReadingService } from "../services/water-readings";
 import { CareService } from "../services/care";
 import { emptyData, type AppData } from "../domain/models";
 import { nativeNotifications } from "../services/notifications";
@@ -30,10 +31,12 @@ type Result<T> =
 interface Context {
   data: AppData;
   totalLogs: number;
+  totalReadings: number;
   historyVersion: number;
   clockTick: number;
   store: SqlStore | null;
   care: CareService | null;
+  water: WaterReadingService | null;
   loading: boolean;
   busy: boolean;
   error: string | null;
@@ -47,6 +50,8 @@ interface Context {
 const Ctx = createContext<Context | null>(null);
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const [totalLogs, setTotalLogs] = useState(0);
+  const [totalReadings, setTotalReadings] = useState(0);
+  const [water, setWater] = useState<WaterReadingService | null>(null);
   const [historyVersion, setHistoryVersion] = useState(0),
     [clockTick, setClockTick] = useState(Date.now());
   const [data, setData] = useState(emptyData),
@@ -75,6 +80,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           : view.data,
       );
       setTotalLogs(view.totalLogs);
+      setTotalReadings(view.totalReadings);
     }
   }, [store]);
   useEffect(() => {
@@ -88,9 +94,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         if (!alive) return;
         setStore(db);
         setCare(new CareService(db, randomUUID));
+        setWater(new WaterReadingService(db, randomUUID));
         setLanguage(initial.data.settings.language);
         setData(initial.data);
         setTotalLogs(initial.totalLogs);
+        setTotalReadings(initial.totalReadings);
         try {
           cleanUnusedPhotos(initial.data.photos);
         } catch {
@@ -106,6 +114,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
               : current.data,
           );
           setTotalLogs(current.totalLogs);
+          setTotalReadings(current.totalReadings);
         }
       })
       .catch(() => {
@@ -132,6 +141,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             : view.data,
         );
         setTotalLogs(view.totalLogs);
+        setTotalReadings(view.totalReadings);
       } catch {
         setError(tr("messages.couldNotRefreshYourDataPleaseTryAgain"));
       }
@@ -190,6 +200,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       value={{
         data,
         totalLogs,
+        totalReadings,
+        water,
         historyVersion,
         clockTick,
         store,

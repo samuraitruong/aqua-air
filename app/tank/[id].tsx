@@ -33,6 +33,11 @@ import { localDate, formatDate } from "../../src/domain/dates";
 import { lastWaterChange } from "../../src/domain/selectors";
 import { copy } from "../../src/i18n";
 import { shortDate } from "../../src/ui/date-labels";
+import { useWaterReadings } from "../../src/state/useWaterReadings";
+import {
+  TankWaterSummary,
+  WaterReadingsPanel,
+} from "../../src/ui/water-readings";
 export default function Detail() {
   const { id } = useLocalSearchParams<{
     id: string;
@@ -43,6 +48,7 @@ export default function Detail() {
   const [tab, setTab] = useState("history"),
     [filter, setFilter] = useState("all"),
     [showFilter, setShowFilter] = useState(false);
+  const measurements = useWaterReadings(id, tab === "water");
   const page = useHistory(id, filter);
   const history = page.logs;
   if (!tank)
@@ -224,6 +230,12 @@ export default function Detail() {
           </Card>
         </View>
       </View>
+      {measurements.result && (
+        <TankWaterSummary
+          values={measurements.result.latest}
+          onPress={() => setTab("water")}
+        />
+      )}
       {!tank.archivedAt && (
         <Button
           title={tr("care.logTitle")}
@@ -237,11 +249,21 @@ export default function Detail() {
           }
         />
       )}
+      {!tank.archivedAt && (
+        <Button
+          title={tr("readings.log")}
+          variant="secondary"
+          onPress={() =>
+            router.push({ pathname: "/water/edit", params: { tankId: id } })
+          }
+        />
+      )}
       <UnderlineTabs
         value={tab}
         onChange={setTab}
         options={[
           ["history", tr("messages.history")],
+          ["water", tr("readings.title")],
           ["schedule", tr("schedule.title")],
           ["info", tr("messages.information")],
         ]}
@@ -364,6 +386,12 @@ export default function Detail() {
                   ? tr("messages.loadingHistory")
                   : tr("messages.noMatchingActivitiesYet"))
               }
+            />
+          ) : tab === "water" ? (
+            <WaterReadingsPanel
+              tankId={id}
+              archived={!!tank.archivedAt}
+              page={measurements}
             />
           ) : tab === "schedule" ? (
             <View

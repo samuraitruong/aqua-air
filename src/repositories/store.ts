@@ -1,7 +1,13 @@
 import { UserFacingError } from "../domain/error";
 import { t as tr, isLanguage, defaultLanguage } from "../i18n";
 import { emptyData, type AppData, type CareLog } from "../domain/models";
-import { migration1, migration2, migration3, migration4 } from "./schema";
+import {
+  migration1,
+  migration2,
+  migration3,
+  migration4,
+  migration5,
+} from "./schema";
 export type SqlValue = string | number | null;
 export interface SqlDriver {
   exec(sql: string): Promise<void>;
@@ -15,9 +21,17 @@ export interface Store {
   read(): Promise<AppData>;
   write<T>(fn: (data: AppData) => T | Promise<T>): Promise<T>;
 }
+import {
+  queryWaterHistory,
+  queryWaterReading,
+  queryLatestWaterValues,
+} from "./water-readings";
 const tables = [
   ["photos", "photos", "id"],
   ["tanks", "tanks", "id"],
+  ["waterParameters", "water_parameters", "id"],
+  ["waterReadings", "water_readings", "id"],
+  ["waterValues", "water_reading_values", "id"],
   ["schedules", "care_schedules", "id"],
   ["logs", "care_logs", "id"],
   ["reminders", "reminder_settings", "scheduleId"],
@@ -25,6 +39,25 @@ const tables = [
   ["outbox", "notification_outbox", "id"],
 ] as const;
 const columns: Record<string, string[]> = {
+  water_parameters: ["id", "tankId", "name", "unit", "createdAt", "updatedAt"],
+  water_readings: [
+    "id",
+    "tankId",
+    "performedAt",
+    "performedLocalDate",
+    "notes",
+    "idempotencyKey",
+    "createdAt",
+    "updatedAt",
+  ],
+  water_reading_values: [
+    "id",
+    "readingId",
+    "parameterKey",
+    "nameSnapshot",
+    "unitSnapshot",
+    "value",
+  ],
   photos: [
     "id",
     "relativePath",
@@ -129,15 +162,16 @@ export class SqlStore implements Store {
       user_version: number;
     }>("PRAGMA user_version");
     const version = row[0]?.user_version ?? 0;
-    if (version > 4)
+    if (version > 5)
       throw new UserFacingError("messages.thisDataBelongsToANewerVersionOf");
-    if (version < 4) {
+    if (version < 5) {
       await this.db.exec("BEGIN IMMEDIATE");
       try {
         if (version === 0) await this.db.exec(migration1);
         if (version < 2) await this.db.exec(migration2);
         if (version < 3) await this.db.exec(migration3);
-        await this.db.exec(migration4);
+        if (version < 4) await this.db.exec(migration4);
+        await this.db.exec(migration5);
         await this.db.exec("COMMIT");
       } catch (e) {
         await this.db.exec("ROLLBACK");
@@ -148,6 +182,8 @@ export class SqlStore implements Store {
   private async readDirect(summary = false): Promise<AppData> {
     const data = emptyData();
     for (const [key, table] of tables) {
+      if (summary && (key === "waterReadings" || key === "waterValues"))
+        continue;
       const rows = await this.db.all(
         table === "care_logs"
           ? summary
@@ -288,6 +324,7 @@ UNION SELECT id FROM (SELECT id,ROW_NUMBER() OVER(PARTITION BY tankId ORDER BY p
   async view(): Promise<{
     data: AppData;
     totalLogs: number;
+    totalReadings: number;
   }> {
     await this.queue;
     const data = await this.readDirect(true);
@@ -297,7 +334,32 @@ UNION SELECT id FROM (SELECT id,ROW_NUMBER() OVER(PARTITION BY tankId ORDER BY p
     return {
       data,
       totalLogs: counts[0]?.n ?? 0,
+      totalReadings:
+        (
+          await this.db.all<{ n: number }>(
+            "SELECT COUNT(*) AS n FROM water_readings",
+          )
+        )[0]?.n ?? 0,
     };
+  }
+  async waterHistory(
+    tankId: string,
+    cursor?: Pick<
+      import("../domain/models").WaterReading,
+      "performedAt" | "createdAt" | "id"
+    >,
+    limit = 30,
+  ) {
+    await this.queue;
+    return queryWaterHistory(this.db, tankId, cursor, limit);
+  }
+  async getWaterReading(id: string) {
+    await this.queue;
+    return queryWaterReading(this.db, id);
+  }
+  async latestWaterValues(tankId: string) {
+    await this.queue;
+    return queryLatestWaterValues(this.db, tankId);
   }
   async monthlyWaterUsage(
     month: string,

@@ -36,3 +36,13 @@ ALTER TABLE care_logs ADD COLUMN waterCapacityLitres REAL CHECK(waterCapacityLit
 ALTER TABLE care_logs ADD COLUMN waterCapacityRecorded INTEGER NOT NULL DEFAULT 0 CHECK(waterCapacityRecorded IN (0,1));
 PRAGMA user_version=4;
 `;
+
+export const migration5 = `
+CREATE TABLE water_parameters (id TEXT PRIMARY KEY, tankId TEXT NOT NULL REFERENCES tanks(id) ON DELETE CASCADE, name TEXT NOT NULL CHECK(length(trim(name)) BETWEEN 1 AND 60), unit TEXT NOT NULL CHECK(length(unit)<=24), createdAt TEXT NOT NULL, updatedAt TEXT NOT NULL);
+CREATE TABLE water_readings (id TEXT PRIMARY KEY, tankId TEXT NOT NULL REFERENCES tanks(id) ON DELETE CASCADE, performedAt TEXT NOT NULL, performedLocalDate TEXT NOT NULL, notes TEXT NOT NULL CHECK(length(notes)<=2000), idempotencyKey TEXT NOT NULL UNIQUE, createdAt TEXT NOT NULL, updatedAt TEXT NOT NULL);
+CREATE TABLE water_reading_values (id TEXT PRIMARY KEY, readingId TEXT NOT NULL REFERENCES water_readings(id) ON DELETE CASCADE, parameterKey TEXT NOT NULL, nameSnapshot TEXT NOT NULL, unitSnapshot TEXT NOT NULL, value REAL NOT NULL CHECK(value BETWEEN -1000000000 AND 1000000000), UNIQUE(readingId,parameterKey), CHECK(parameterKey<>'ph' OR value BETWEEN 0 AND 14));
+CREATE INDEX idx_water_readings_tank ON water_readings(tankId,performedAt DESC,createdAt DESC,id DESC);
+CREATE INDEX idx_water_parameters_tank ON water_parameters(tankId);
+CREATE INDEX idx_water_values_reading ON water_reading_values(readingId);
+PRAGMA user_version=5;
+`;

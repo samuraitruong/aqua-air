@@ -165,7 +165,7 @@ test("existing schema-3 logs migrate without losing history and snapshot metadat
   await care.saveLog(log(id));
   // Recreate the shape of an existing version-3 database, then upgrade it.
   db.exec(
-    "ALTER TABLE care_logs DROP COLUMN waterCapacityLitres; ALTER TABLE care_logs DROP COLUMN waterCapacityRecorded; PRAGMA user_version=3;",
+    "DROP TABLE water_reading_values; DROP TABLE water_readings; DROP TABLE water_parameters; ALTER TABLE care_logs DROP COLUMN waterCapacityLitres; ALTER TABLE care_logs DROP COLUMN waterCapacityRecorded; PRAGMA user_version=3;",
   );
   await store.init();
   assert.equal((await store.read()).logs.length, 1);
