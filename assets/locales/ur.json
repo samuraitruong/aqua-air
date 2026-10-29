@@ -1,0 +1,6 @@
+{
+  "ios": {
+    "NSPhotoLibraryUsageDescription": "اپنے ایکویریم کے لیے سرورق کی تصویر منتخب کریں۔",
+    "NSCameraUsageDescription": "اپنے ایکویریم کے لیے سرورق کی تصویر لیں۔"
+  }
+}

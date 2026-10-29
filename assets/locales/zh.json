@@ -1,0 +1,6 @@
+{
+  "ios": {
+    "NSPhotoLibraryUsageDescription": "为您的鱼缸选择封面照片。",
+    "NSCameraUsageDescription": "为您的鱼缸拍摄封面照片。"
+  }
+}

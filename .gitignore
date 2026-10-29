@@ -1,0 +1,21 @@
+node_modules/
+.expo/
+dist/
+artifacts/
+.superpowers/
+ios/
+android/
+*.log
+.DS_Store
+
+# Local release credentials and native artifacts
+build/
+.env
+.env.*
+!.env.example
+*.jks
+*.keystore
+*.p12
+*.p8
+*.mobileprovision
+credentials.json

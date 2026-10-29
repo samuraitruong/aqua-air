@@ -1,0 +1,6 @@
+{
+  "ios": {
+    "NSPhotoLibraryUsageDescription": "اختر صورة غلاف لحوض أسماكك.",
+    "NSCameraUsageDescription": "التقط صورة غلاف لحوض أسماكك."
+  }
+}

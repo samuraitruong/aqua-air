@@ -1,0 +1,6 @@
+{
+  "ios": {
+    "NSPhotoLibraryUsageDescription": "Chọn ảnh đại diện cho bể cá của bạn.",
+    "NSCameraUsageDescription": "Chụp ảnh đại diện cho bể cá của bạn."
+  }
+}

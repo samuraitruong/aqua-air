@@ -1,0 +1,6 @@
+{
+  "ios": {
+    "NSPhotoLibraryUsageDescription": "Elige una foto de portada para tu acuario.",
+    "NSCameraUsageDescription": "Toma una foto de portada para tu acuario."
+  }
+}

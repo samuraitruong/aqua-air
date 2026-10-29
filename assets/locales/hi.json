@@ -1,0 +1,6 @@
+{
+  "ios": {
+    "NSPhotoLibraryUsageDescription": "अपने एक्वेरियम के लिए कवर फ़ोटो चुनें।",
+    "NSCameraUsageDescription": "अपने एक्वेरियम के लिए कवर फ़ोटो लें।"
+  }
+}

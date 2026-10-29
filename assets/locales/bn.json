@@ -1,0 +1,6 @@
+{
+  "ios": {
+    "NSPhotoLibraryUsageDescription": "আপনার অ্যাকোয়ারিয়ামের জন্য একটি কভার ফটো বেছে নিন।",
+    "NSCameraUsageDescription": "আপনার অ্যাকোয়ারিয়ামের জন্য একটি কভার ফটো তুলুন।"
+  }
+}

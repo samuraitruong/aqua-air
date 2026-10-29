@@ -1,0 +1,6 @@
+{
+  "ios": {
+    "NSPhotoLibraryUsageDescription": "Choose a cover photo for your tank.",
+    "NSCameraUsageDescription": "Take a cover photo for your tank."
+  }
+}

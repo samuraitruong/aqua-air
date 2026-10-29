@@ -1,0 +1,7 @@
+{
+  "water_change": ["Thay nước", "Water change"],
+  "filter_clean": ["Vệ sinh lọc", "Filter cleaning"],
+  "substrate_clean": ["Hút cặn", "Substrate cleaning"],
+  "plant_care": ["Chăm cây", "Plant care"],
+  "other": ["Hoạt động khác", "Other activity"]
+}

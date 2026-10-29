@@ -1,0 +1,6 @@
+{
+  "ios": {
+    "NSPhotoLibraryUsageDescription": "Pilih foto sampul untuk akuarium Anda.",
+    "NSCameraUsageDescription": "Ambil foto sampul untuk akuarium Anda."
+  }
+}

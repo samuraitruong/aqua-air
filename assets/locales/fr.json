@@ -1,0 +1,6 @@
+{
+  "ios": {
+    "NSPhotoLibraryUsageDescription": "Choisissez une photo de couverture pour votre aquarium.",
+    "NSCameraUsageDescription": "Prenez une photo de couverture pour votre aquarium."
+  }
+}
