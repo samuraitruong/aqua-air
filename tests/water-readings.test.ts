@@ -157,7 +157,7 @@ test("water readings backup format 3 preserves all tables and rejects damaged re
   });
   const data = await store.read(),
     backup = decodeBackup(encodeBackup(data, {}, "2026-10-29T12:00:00Z"));
-  assert.equal(backup.manifest.formatVersion, 3);
+  assert.equal(backup.manifest.formatVersion, 4);
   assert.deepEqual(backup.data.waterValues, data.waterValues);
   assert.equal(backup.manifest.counts.waterReadings, 1);
   const bad = structuredClone(data);
@@ -195,7 +195,7 @@ test("schema 4 upgrades with existing tanks; future dates/empty sessions fail wi
   assert.equal((await store.read()).tanks[0]!.name, "Existing");
   assert.equal(
     (db.prepare("PRAGMA user_version").get() as any).user_version,
-    5,
+    6,
   );
   await assert.rejects(() =>
     water.saveReading({ ...input(id), performedAt: "2026-10-30T10:00:00Z" }),

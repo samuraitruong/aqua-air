@@ -149,7 +149,51 @@ export interface LatestWaterValue extends WaterValue {
   performedAt: string;
   performedLocalDate: string;
 }
+export interface ReadingPreset {
+  id: string;
+  tankId: string;
+  name: string;
+  parameterKeys: string[];
+  isDefault: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+export interface WaterTarget {
+  id: string;
+  tankId: string;
+  parameterKey: string;
+  lower: number | null;
+  upper: number | null;
+  createdAt: string;
+  updatedAt: string;
+}
+export interface TankPreference {
+  id: string;
+  tankId: string;
+  staleDays: number;
+  createdAt: string;
+  updatedAt: string;
+}
+export interface JournalEntry {
+  id: string;
+  tankId: string;
+  photoId: string | null;
+  performedAt: string;
+  performedLocalDate: string;
+  notes: string;
+  createdAt: string;
+  updatedAt: string;
+}
+export interface InsightRange {
+  readings: WaterReading[];
+  values: WaterValue[];
+  logs: CareLog[];
+}
 export interface AppData {
+  readingPresets: ReadingPreset[];
+  waterTargets: WaterTarget[];
+  tankPreferences: TankPreference[];
+  journalEntries: JournalEntry[];
   waterParameters: WaterParameter[];
   waterReadings: WaterReading[];
   waterValues: WaterValue[];
@@ -163,6 +207,10 @@ export interface AppData {
   settings: Settings;
 }
 export const emptyData = (): AppData => ({
+  readingPresets: [],
+  waterTargets: [],
+  tankPreferences: [],
+  journalEntries: [],
   waterParameters: [],
   waterReadings: [],
   waterValues: [],

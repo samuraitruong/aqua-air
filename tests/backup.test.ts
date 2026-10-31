@@ -177,7 +177,7 @@ test("backup round trip includes dimensions, sump litres and both filters", () =
   const preview = decodeBackup(
     encodeBackup(d, { "photos/test.jpg": image }, "2026-10-28T10:00:00Z"),
   );
-  assert.equal(preview.manifest.formatVersion, 3);
+  assert.equal(preview.manifest.formatVersion, 4);
   assert.equal(preview.data.tanks[0]?.lengthCm, 100);
   assert.equal(preview.data.tanks[0]?.volumeLitres, 200);
   assert.equal(preview.data.tanks[0]?.hasSump, true);

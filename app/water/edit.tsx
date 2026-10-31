@@ -1,3 +1,4 @@
+import { presetFields } from "../../src/domain/tank-insights";
 import React, { useEffect, useRef, useState } from "react";
 import { View, Alert } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -20,6 +21,7 @@ import {
   Empty,
   Banner,
   SectionHeading,
+  SelectField,
   useFormGuard,
 } from "../../src/ui/components";
 import { Text } from "../../src/ui/text";
@@ -105,6 +107,16 @@ function WaterForm({ original }: { original?: WaterReadingWithValues }) {
     })),
     ...custom.map((p) => ({ key: p.id, name: p.name, unit: p.unit })),
   ];
+  const presets = app.data.readingPresets.filter((p) => p.tankId === tankId);
+  const [presetId, setPresetId] = useState(
+    original ? "" : (presets.find((p) => p.isDefault)?.id ?? ""),
+  );
+  const selectedPreset = presets.find((p) => p.id === presetId);
+  const visible = presetFields(
+    selectedPreset?.parameterKeys ?? fields.map((f) => f.key),
+    values,
+    fields.map((f) => f.key),
+  );
   function back() {
     allow.current = true;
     if (router.canGoBack()) router.back();
@@ -177,18 +189,34 @@ function WaterForm({ original }: { original?: WaterReadingWithValues }) {
         />
       </Card>
       <Card>
-        {fields.map((field) => (
-          <Field
-            key={field.key}
-            label={field.name + (field.unit ? ` (${field.unit})` : "")}
-            value={values[field.key] ?? ""}
-            onChangeText={(v) =>
-              setValues((old) => ({ ...old, [field.key]: v }))
-            }
-            keyboardType="numbers-and-punctuation"
-            placeholder="—"
-          />
-        ))}
+        {!original && presets.length > 0 && (
+          <>
+            <SelectField
+              label={t("insights.presets")}
+              value={presetId}
+              options={[
+                ["", t("insights.all")],
+                ...presets.map((p) => [p.id, p.name] as const),
+              ]}
+              onChange={setPresetId}
+            />
+            <Text style={s.tiny}>{t("insights.noValuesCopied")}</Text>
+          </>
+        )}
+        {visible
+          .map((key) => fields.find((f) => f.key === key)!)
+          .map((field) => (
+            <Field
+              key={field.key}
+              label={field.name + (field.unit ? ` (${field.unit})` : "")}
+              value={values[field.key] ?? ""}
+              onChangeText={(v) =>
+                setValues((old) => ({ ...old, [field.key]: v }))
+              }
+              keyboardType="numbers-and-punctuation"
+              placeholder="—"
+            />
+          ))}
       </Card>
       <Button
         title={t("readings.addParameter")}

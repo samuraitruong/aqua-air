@@ -1,3 +1,7 @@
+import {
+  validateInsightsData,
+  insightCollections,
+} from "./insights-validation";
 import { t as tr, isLanguage, defaultLanguage } from "../i18n";
 import { zipSync, unzipSync, strToU8, strFromU8 } from "fflate";
 import { sha256 } from "@noble/hashes/sha2.js";
@@ -37,6 +41,10 @@ export interface Manifest {
     waterReadings?: number;
     waterParameters?: number;
     waterValues?: number;
+    readingPresets?: number;
+    waterTargets?: number;
+    tankPreferences?: number;
+    journalEntries?: number;
   };
   files: {
     path: string;
@@ -80,6 +88,7 @@ export function validateData(input: unknown): asserts input is AppData {
     return set;
   };
   validateWaterData(d);
+  validateInsightsData(d);
   const tanks = ids(d.tanks),
     photos = ids(d.photos),
     schedules = ids(d.schedules);
@@ -304,7 +313,7 @@ export function encodeBackup(
   data.tanks = data.tanks.map((tank) => validateTank(tank));
   files["data.json"] = strToU8(JSON.stringify(data));
   const manifest: Manifest = {
-    formatVersion: 3,
+    formatVersion: 4,
     appVersion: "1.0.0",
     exportedAt,
     counts: {
@@ -315,6 +324,10 @@ export function encodeBackup(
       waterReadings: data.waterReadings.length,
       waterParameters: data.waterParameters.length,
       waterValues: data.waterValues.length,
+      readingPresets: data.readingPresets.length,
+      waterTargets: data.waterTargets.length,
+      tankPreferences: data.tankPreferences.length,
+      journalEntries: data.journalEntries.length,
     },
     files: Object.entries(files).map(([path, b]) => ({
       path,
@@ -375,7 +388,7 @@ export function decodeBackup(bytes: Uint8Array): BackupPreview {
   );
   const manifest = JSON.parse(strFromU8(files["manifest.json"])) as Manifest;
   requireValue(
-    [1, 2, 3].includes(manifest.formatVersion),
+    [1, 2, 3, 4].includes(manifest.formatVersion),
     tr("messages.thisBackupVersionIsNotSupported"),
   );
   requireValue(
@@ -400,8 +413,21 @@ export function decodeBackup(bytes: Uint8Array): BackupPreview {
     tr("messages.theArchiveContainsFilesNotListedInThe"),
   );
   const data: unknown = JSON.parse(strFromU8(files["data.json"]));
+  if (manifest.formatVersion < 4) {
+    const legacy = data as AppData;
+    for (const key of insightCollections) {
+      requireValue(!legacy[key]?.length, tr("insights.invalid"));
+      legacy[key] = [];
+    }
+  }
   validateData(data);
-  if (manifest.formatVersion === 3)
+  if (manifest.formatVersion === 4)
+    for (const key of insightCollections)
+      requireValue(
+        manifest.counts?.[key] === data[key].length,
+        tr("validation.theRecordCountsDoNotMatch"),
+      );
+  if (manifest.formatVersion >= 3)
     requireValue(
       Array.isArray(data.waterReadings) &&
         Array.isArray(data.waterParameters) &&
@@ -473,6 +499,13 @@ export function decodeBackup(bytes: Uint8Array): BackupPreview {
     l.createdAt = new Date(l.createdAt).toISOString();
     l.updatedAt = new Date(l.updatedAt).toISOString();
   }
+  for (const key of insightCollections)
+    for (const row of data[key]) {
+      row.createdAt = new Date(row.createdAt).toISOString();
+      row.updatedAt = new Date(row.updatedAt).toISOString();
+    }
+  for (const row of data.journalEntries)
+    row.performedAt = new Date(row.performedAt).toISOString();
   for (const p of data.waterParameters) {
     p.createdAt = new Date(p.createdAt).toISOString();
     p.updatedAt = new Date(p.updatedAt).toISOString();

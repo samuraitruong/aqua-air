@@ -1,3 +1,5 @@
+import { useApp } from "../state/AppProvider";
+import { matchingTarget, targetStatus, isStale } from "../domain/tank-insights";
 import React from "react";
 import { View } from "react-native";
 import { useRouter } from "expo-router";
@@ -43,10 +45,42 @@ function ordered<T extends WaterValue>(values: T[]) {
     );
   });
 }
+function LatestStatus({
+  tankId,
+  value,
+}: {
+  tankId: string;
+  value: LatestWaterValue;
+}) {
+  const app = useApp();
+  const status = targetStatus(
+    value.value,
+    matchingTarget(app.data, tankId, value.parameterKey, value.unitSnapshot),
+  );
+  const days =
+    app.data.tankPreferences.find((p) => p.tankId === tankId)?.staleDays ?? 7;
+  return (
+    <>
+      {status && (
+        <Text
+          style={[s.tiny, { color: status === "within" ? c.green : c.overdue }]}
+        >
+          {status === "within" ? "✓ " : status === "below" ? "↓ " : "↑ "}
+          {t(`insights.${status}`)}
+        </Text>
+      )}
+      {isStale(value.performedAt, days, new Date(app.clockTick)) && (
+        <Text style={s.tiny}>{t("insights.stale")}</Text>
+      )}
+    </>
+  );
+}
 export function TankWaterSummary({
+  tankId,
   values,
   onPress,
 }: {
+  tankId: string;
   values: LatestWaterValue[];
   onPress: () => void;
 }) {
@@ -74,6 +108,7 @@ export function TankWaterSummary({
                 <Text style={s.tiny}>{v.unitSnapshot}</Text>
               </Text>
               <Text style={s.tiny}>{readingDate(v.performedAt)}</Text>
+              <LatestStatus tankId={tankId} value={v} />
             </View>
           ))}
       </View>
@@ -132,6 +167,7 @@ export function WaterReadingsPanel({
                       <Text style={s.muted}>{v.unitSnapshot}</Text>
                     </Text>
                     <Text style={s.tiny}>{readingDate(v.performedAt)}</Text>
+                    <LatestStatus tankId={tankId} value={v} />
                   </Card>
                 </View>
               ))}

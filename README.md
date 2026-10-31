@@ -34,7 +34,7 @@ Vào **Cài đặt → Ngôn ngữ** để chọn **Tiếng Việt**, English, �
 - Đóng/mở app giữ dữ liệu. Gỡ app hoặc xóa dữ liệu ứng dụng có thể làm mất dữ liệu; cần xuất backup trước.
 - Không seed dữ liệu mẫu vào app. Ảnh minh họa chào mừng lấy từ bộ thiết kế, không tạo bản ghi bể hoặc nhật ký.
 
-Schema và migration: `src/repositories/schema.ts`. `SqlStore.init()` đọc `PRAGMA user_version`, nâng version bằng transaction; schema hiện tại **5**. Version 2 thêm index tra cứu lịch theo ngày; version 3 thêm kích thước và bộ lọc, giữ dung tích/lịch sử cũ; version 4 lưu dung tích tại thời điểm thay nước để tính lượng nước theo tháng; version 5 thêm thông số nước theo bể. Không tự reset database khi có lỗi hoặc gặp version mới hơn.
+Schema và migration: `src/repositories/schema.ts`. `SqlStore.init()` đọc `PRAGMA user_version`, nâng version bằng transaction; schema hiện tại **6**. Version 2 thêm index tra cứu lịch theo ngày; version 3 thêm kích thước và bộ lọc, giữ dung tích/lịch sử cũ; version 4 lưu dung tích tại thời điểm thay nước để tính lượng nước theo tháng; version 5 thêm thông số nước theo bể; version 6 thêm mẫu đo, mục tiêu, nhật ký ảnh và báo cáo. Không tự reset database khi có lỗi hoặc gặp version mới hơn.
 
 Tổng quan tải latest log theo lịch và lần thay nước mới nhất mỗi bể. Lịch sử bể dùng cursor `(performedAt,createdAt,id)`, mỗi trang 30 bản ghi, `FlatList` chỉ dựng vùng nhìn thấy. Mutation và export đọc snapshot đầy đủ trong transaction để bảo toàn quy tắc lịch.
 
@@ -60,7 +60,7 @@ Mutation commit dữ liệu/revision/outbox trước khi gọi OS. Worker chạy
 
 ## Sao lưu và khôi phục
 
-Cài đặt → Sao lưu và khôi phục → Tạo bản sao lưu → share sheet chọn nơi lưu. File mới dùng formatVersion 3 và vẫn đọc được backup version 1/2. `.aquaair` là ZIP gồm `manifest.json`, `data.json` và `photos/*`, có version, counts, sizes và SHA-256; không chứa OS notification ID hoặc absolute sandbox path. File không được app mã hóa.
+Cài đặt → Sao lưu và khôi phục → Tạo bản sao lưu → share sheet chọn nơi lưu. File mới dùng formatVersion 4 và vẫn đọc được backup version 1/2/3. `.aquaair` là ZIP gồm `manifest.json`, `data.json` và `photos/*`, có version, counts, sizes và SHA-256; không chứa OS notification ID hoặc absolute sandbox path. File không được app mã hóa.
 
 Khôi phục: chọn file → kiểm tra toàn bộ → xem tóm tắt → có thể sao lưu dữ liệu hiện tại → xác nhận Thay thế và khôi phục. MVP không merge.
 
@@ -115,10 +115,18 @@ Trong chi tiết bể, chọn **Ghi nhận thông số nước** hoặc tab **Th
 
 Kết quả gần nhất được lấy riêng cho từng chỉ số và luôn kèm thời gian; lịch sử phân trang 30 lần đo. Có thể sửa/xóa lần đo; bể lưu trữ chỉ xem được. Các bản ghi mới không thay đổi lịch chăm sóc hoặc lượng nước thay trên dashboard.
 
-Sao lưu ghi định dạng **3**, gồm các định nghĩa chỉ số riêng, lần đo và kết quả. Bản cũ định dạng 1/2 vẫn nhập được, với nhật ký đo rỗng. Bản ứng dụng cũ từ chối định dạng 3 để tránh bỏ mất thông số nước.
+Sao lưu ghi định dạng **4**, gồm các định nghĩa chỉ số riêng, lần đo và kết quả. Bản cũ định dạng 1/2 vẫn nhập được, với nhật ký đo rỗng. Bản ứng dụng cũ từ chối định dạng 3 để tránh bỏ mất thông số nước.
 
 ## GitHub Actions CI
 
 Workflow `.github/workflows/ci.yml` runs on pushes, pull requests and manual dispatch. It uses Node 22, `npm ci`, TypeScript/tests, formatting and Expo exports for both iOS and Android. npm downloads and Metro transforms are cached; Metro cache reuse stays within the same Node version and lockfile. Superseded PR/feature runs are cancelled; default-branch runs are queued so an active deployment can finish.
 
 Successful runs upload `aquaair-app-bundles` and `aquaair-website` artifacts for 7 days. After successful CI on the default branch, a separate job deploys the static site to GitHub Pages. Pull requests and feature branches only validate. Enable Settings → Pages → Source: GitHub Actions once; see [web/README.md](web/README.md) for the default URL and optional custom-domain setup. CI exports app bundles; signed APK/AAB/IPA files still use the local release commands. No signing credentials or Expo account are needed. Native release commands remain documented in [docs/release.md](docs/release.md).
+
+## Tank insights, photo journal and reports
+
+Tank details now link to parameter charts (7/30/90 days), per-tank measurement presets and personal target ranges, a dated photo journal with two-photo comparison, and CSV/PDF exports. All data remains offline in SQLite. Target ranges are user preferences rather than species-specific safety advice; latest results retain their timestamps and can be marked old after a configurable interval (default 7 days).
+
+Presets select fields without copying old values. Selected order is retained, and switching presets keeps typed values visible. Charts show one parameter/unit at a time, use current-device timezone date windows, and display water-change markers. Charts sample at most 200 points; statistics/exports retain every result. Reports filter the recorded local dates shown in care/measurement history.
+
+Photo journal entries store one resized local photo plus date/time and notes. Backup format 4 includes presets, targets, preferences, journal entries and photos; versions 1–3 remain readable. Exports are UTF-8 CSV or locally generated PDFs and cannot restore the app. PDF reports contain tank details, measurement statistics/history and care history, without photos. Expo Print is a new native module: rebuild the development app after installing dependencies (`npm run ios` / `npm run android`).

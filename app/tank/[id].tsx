@@ -260,7 +260,11 @@ export default function Detail() {
         </View>
       </View>
       {measurements.latest.length > 0 && (
-        <TankWaterSummary values={measurements.latest} onPress={showWater} />
+        <TankWaterSummary
+          tankId={id}
+          values={measurements.latest}
+          onPress={showWater}
+        />
       )}
       {!tank.archivedAt && (
         <Button
@@ -284,6 +288,30 @@ export default function Detail() {
           }
         />
       )}
+      <Card>
+        {(
+          [
+            ["/tank/insights", "insights.charts"],
+            ["/tank/journal", "insights.journal"],
+            ["/tank/export", "insights.export"],
+            ...(!tank.archivedAt
+              ? [["/tank/preferences", "insights.preferences"]]
+              : []),
+          ] as const
+        ).map(([path, label]) => (
+          <Button
+            key={path}
+            title={tr(label as import("../../src/i18n").MessageKey)}
+            variant="secondary"
+            onPress={() =>
+              router.push({
+                pathname: path as "/tank/insights",
+                params: { tankId: id },
+              })
+            }
+          />
+        ))}
+      </Card>
       <UnderlineTabs
         value={tab}
         onChange={setTab}

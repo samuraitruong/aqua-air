@@ -21,6 +21,7 @@ async function snapshot(store: Store, withoutPhotos = false) {
     const files: Record<string, Uint8Array> = {};
     if (withoutPhotos) {
       data.photos = [];
+      data.journalEntries.forEach((j) => (j.photoId = null));
       data.tanks.forEach((t) => (t.coverPhotoId = null));
     } else
       for (const p of data.photos) {

@@ -253,7 +253,7 @@ test("migration from schema 1 preserves legacy volume and adds geometry/filter f
   assert.equal(d.tanks[0]?.hasCanister, false);
   assert.equal(
     (db.prepare("PRAGMA user_version").get() as any).user_version,
-    5,
+    6,
   );
   await store.init();
   assert.equal((await store.read()).tanks.length, 1);

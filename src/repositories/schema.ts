@@ -46,3 +46,16 @@ CREATE INDEX idx_water_parameters_tank ON water_parameters(tankId);
 CREATE INDEX idx_water_values_reading ON water_reading_values(readingId);
 PRAGMA user_version=5;
 `;
+
+export const migration6 = `
+CREATE TABLE reading_presets (id TEXT PRIMARY KEY, tankId TEXT NOT NULL REFERENCES tanks(id) ON DELETE CASCADE, name TEXT NOT NULL, parameterKeys TEXT NOT NULL, isDefault INTEGER NOT NULL CHECK(isDefault IN (0,1)), createdAt TEXT NOT NULL, updatedAt TEXT NOT NULL);
+CREATE INDEX idx_presets_tank ON reading_presets(tankId);
+CREATE UNIQUE INDEX idx_default_preset ON reading_presets(tankId) WHERE isDefault=1;
+CREATE TABLE water_targets (id TEXT PRIMARY KEY, tankId TEXT NOT NULL REFERENCES tanks(id) ON DELETE CASCADE, parameterKey TEXT NOT NULL, lower REAL, upper REAL, createdAt TEXT NOT NULL, updatedAt TEXT NOT NULL, UNIQUE(tankId,parameterKey), CHECK(lower IS NOT NULL OR upper IS NOT NULL), CHECK(lower IS NULL OR upper IS NULL OR lower<=upper));
+CREATE TABLE tank_preferences (id TEXT PRIMARY KEY, tankId TEXT NOT NULL UNIQUE REFERENCES tanks(id) ON DELETE CASCADE, staleDays INTEGER NOT NULL CHECK(staleDays BETWEEN 1 AND 365 AND staleDays=CAST(staleDays AS INTEGER)), createdAt TEXT NOT NULL, updatedAt TEXT NOT NULL);
+CREATE TABLE journal_entries (id TEXT PRIMARY KEY, tankId TEXT NOT NULL REFERENCES tanks(id) ON DELETE CASCADE, photoId TEXT REFERENCES photos(id) ON DELETE SET NULL, performedAt TEXT NOT NULL, performedLocalDate TEXT NOT NULL, notes TEXT NOT NULL CHECK(length(notes)<=2000), createdAt TEXT NOT NULL, updatedAt TEXT NOT NULL);
+CREATE INDEX idx_journal_tank ON journal_entries(tankId,performedAt DESC,createdAt DESC,id DESC);
+CREATE INDEX idx_readings_tank_local_date ON water_readings(tankId,performedLocalDate);
+CREATE INDEX idx_care_tank_local_date ON care_logs(tankId,performedLocalDate);
+PRAGMA user_version=6;
+`;

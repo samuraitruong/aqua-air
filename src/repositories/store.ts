@@ -1,3 +1,4 @@
+import { isDate, atLocalTime, addDays } from "../domain/dates";
 import { UserFacingError } from "../domain/error";
 import { t as tr, isLanguage, defaultLanguage } from "../i18n";
 import { emptyData, type AppData, type CareLog } from "../domain/models";
@@ -7,6 +8,7 @@ import {
   migration3,
   migration4,
   migration5,
+  migration6,
 } from "./schema";
 export type SqlValue = string | number | null;
 export interface SqlDriver {
@@ -32,6 +34,10 @@ const tables = [
   ["waterParameters", "water_parameters", "id"],
   ["waterReadings", "water_readings", "id"],
   ["waterValues", "water_reading_values", "id"],
+  ["readingPresets", "reading_presets", "id"],
+  ["waterTargets", "water_targets", "id"],
+  ["tankPreferences", "tank_preferences", "id"],
+  ["journalEntries", "journal_entries", "id"],
   ["schedules", "care_schedules", "id"],
   ["logs", "care_logs", "id"],
   ["reminders", "reminder_settings", "scheduleId"],
@@ -39,6 +45,35 @@ const tables = [
   ["outbox", "notification_outbox", "id"],
 ] as const;
 const columns: Record<string, string[]> = {
+  reading_presets: [
+    "id",
+    "tankId",
+    "name",
+    "parameterKeys",
+    "isDefault",
+    "createdAt",
+    "updatedAt",
+  ],
+  water_targets: [
+    "id",
+    "tankId",
+    "parameterKey",
+    "lower",
+    "upper",
+    "createdAt",
+    "updatedAt",
+  ],
+  tank_preferences: ["id", "tankId", "staleDays", "createdAt", "updatedAt"],
+  journal_entries: [
+    "id",
+    "tankId",
+    "photoId",
+    "performedAt",
+    "performedLocalDate",
+    "notes",
+    "createdAt",
+    "updatedAt",
+  ],
   water_parameters: ["id", "tankId", "name", "unit", "createdAt", "updatedAt"],
   water_readings: [
     "id",
@@ -147,6 +182,7 @@ const columns: Record<string, string[]> = {
   ],
 };
 const booleans = new Set([
+  "isDefault",
   "enabled",
   "overdueOnce",
   "hasSump",
@@ -162,16 +198,17 @@ export class SqlStore implements Store {
       user_version: number;
     }>("PRAGMA user_version");
     const version = row[0]?.user_version ?? 0;
-    if (version > 5)
+    if (version > 6)
       throw new UserFacingError("messages.thisDataBelongsToANewerVersionOf");
-    if (version < 5) {
+    if (version < 6) {
       await this.db.exec("BEGIN IMMEDIATE");
       try {
         if (version === 0) await this.db.exec(migration1);
         if (version < 2) await this.db.exec(migration2);
         if (version < 3) await this.db.exec(migration3);
         if (version < 4) await this.db.exec(migration4);
-        await this.db.exec(migration5);
+        if (version < 5) await this.db.exec(migration5);
+        await this.db.exec(migration6);
         await this.db.exec("COMMIT");
       } catch (e) {
         await this.db.exec("ROLLBACK");
@@ -182,7 +219,12 @@ export class SqlStore implements Store {
   private async readDirect(summary = false): Promise<AppData> {
     const data = emptyData();
     for (const [key, table] of tables) {
-      if (summary && (key === "waterReadings" || key === "waterValues"))
+      if (
+        summary &&
+        (key === "waterReadings" ||
+          key === "waterValues" ||
+          key === "journalEntries")
+      )
         continue;
       const rows = await this.db.all(
         table === "care_logs"
@@ -198,7 +240,11 @@ UNION SELECT id FROM (SELECT id,ROW_NUMBER() OVER(PARTITION BY tankId ORDER BY p
         Object.fromEntries(
           Object.entries(row as object).map(([k, v]) => [
             k,
-            booleans.has(k) ? Boolean(v) : v,
+            k === "parameterKeys"
+              ? JSON.parse(v as string)
+              : booleans.has(k)
+                ? Boolean(v)
+                : v,
           ]),
         ),
       );
@@ -273,6 +319,10 @@ UNION SELECT id FROM (SELECT id,ROW_NUMBER() OVER(PARTITION BY tankId ORDER BY p
           );
       }
     }
+    // Demote old defaults before promoting a different preset under the partial unique index.
+    await this.db.run(
+      "UPDATE reading_presets SET isDefault=0 WHERE isDefault=1",
+    );
     for (const [key, table, pk] of tables) {
       const old = new Map(
         (before[key] as unknown as Record<string, unknown>[]).map((r) => [
@@ -281,7 +331,11 @@ UNION SELECT id FROM (SELECT id,ROW_NUMBER() OVER(PARTITION BY tankId ORDER BY p
         ]),
       );
       for (const row of after[key] as unknown as Record<string, unknown>[]) {
-        if (old.get(row[pk]) === JSON.stringify(row)) continue;
+        if (
+          table !== "reading_presets" &&
+          old.get(row[pk]) === JSON.stringify(row)
+        )
+          continue;
         const cols = columns[table]!;
         const record =
           table === "tanks"
@@ -307,9 +361,11 @@ UNION SELECT id FROM (SELECT id,ROW_NUMBER() OVER(PARTITION BY tankId ORDER BY p
             .map((c) => `${c}=excluded.${c}`)
             .join(",")}`,
           ...cols.map((c) =>
-            typeof record[c] === "boolean"
-              ? Number(record[c])
-              : (record[c] as SqlValue),
+            c === "parameterKeys"
+              ? JSON.stringify(record[c])
+              : typeof record[c] === "boolean"
+                ? Number(record[c])
+                : (record[c] as SqlValue),
           ),
         );
       }
@@ -341,6 +397,93 @@ UNION SELECT id FROM (SELECT id,ROW_NUMBER() OVER(PARTITION BY tankId ORDER BY p
           )
         )[0]?.n ?? 0,
     };
+  }
+  async insightRange(
+    tankId: string,
+    start: string,
+    end: string,
+    byTimestamp = false,
+  ): Promise<import("../domain/models").InsightRange> {
+    if (!isDate(start) || !isDate(end) || start > end)
+      throw new Error("Invalid range");
+    const operation = this.queue.then(() =>
+      this.rangeDirect(tankId, start, end, byTimestamp),
+    );
+    this.queue = operation.catch(() => {});
+    return operation;
+  }
+  private async rangeDirect(
+    tankId: string,
+    start: string,
+    end: string,
+    byTimestamp: boolean,
+  ) {
+    const column = byTimestamp ? "performedAt" : "performedLocalDate";
+    const from = byTimestamp
+      ? atLocalTime(start, "00:00").toISOString()
+      : start;
+    const to = byTimestamp
+      ? atLocalTime(addDays(end, 1), "00:00").toISOString()
+      : end;
+    const comparison = byTimestamp ? "<" : "<=";
+    await this.db.exec("BEGIN DEFERRED");
+    try {
+      const readings = await this.db.all<
+        import("../domain/models").WaterReading
+      >(
+        `SELECT * FROM water_readings WHERE tankId=? AND ${column}>=? AND ${column}${comparison}? ORDER BY performedAt,createdAt,id`,
+        tankId,
+        from,
+        to,
+      );
+      const values = await this.db.all<import("../domain/models").WaterValue>(
+        `SELECT v.* FROM water_reading_values v JOIN water_readings r ON r.id=v.readingId WHERE r.tankId=? AND r.${column}>=? AND r.${column}${comparison}? ORDER BY r.performedAt,r.createdAt,r.id,v.parameterKey`,
+        tankId,
+        from,
+        to,
+      );
+      const logs = await this.db.all<CareLog>(
+        `SELECT * FROM care_logs WHERE tankId=? AND ${column}>=? AND ${column}${comparison}? ORDER BY performedAt,createdAt,id`,
+        tankId,
+        from,
+        to,
+      );
+      await this.db.exec("COMMIT");
+      return { readings, values, logs };
+    } catch (e) {
+      await this.db.exec("ROLLBACK");
+      throw e;
+    }
+  }
+  async journalHistory(
+    tankId: string,
+    cursor?: Pick<
+      import("../domain/models").JournalEntry,
+      "performedAt" | "createdAt" | "id"
+    >,
+    limit = 31,
+  ) {
+    await this.queue;
+    const args: SqlValue[] = [tankId];
+    let where = "tankId=?";
+    if (cursor) {
+      where += " AND (performedAt,createdAt,id)<(?,?,?)";
+      args.push(cursor.performedAt, cursor.createdAt, cursor.id);
+    }
+    return this.db.all<import("../domain/models").JournalEntry>(
+      `SELECT * FROM journal_entries WHERE ${where} ORDER BY performedAt DESC,createdAt DESC,id DESC LIMIT ?`,
+      ...args,
+      Math.max(1, Math.min(100, Math.trunc(limit))),
+    );
+  }
+  async getJournalEntry(id: string) {
+    await this.queue;
+    return (
+      await this.db.all<import("../domain/models").JournalEntry>(
+        "SELECT * FROM journal_entries WHERE id=?",
+        id,
+      )
+    )[0];
   }
   async waterHistory(
     tankId: string,

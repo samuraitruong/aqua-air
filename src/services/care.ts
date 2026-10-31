@@ -203,7 +203,10 @@ export class CareService {
     });
   }
   private collectPhotos(d: AppData) {
-    const used = new Set(d.tanks.map((t) => t.coverPhotoId));
+    const used = new Set([
+      ...d.tanks.map((t) => t.coverPhotoId),
+      ...d.journalEntries.map((j) => j.photoId),
+    ]);
     d.photos = d.photos.filter((p) => used.has(p.id));
   }
   async saveLog(input: LogInput): Promise<string> {
@@ -403,6 +406,10 @@ export class CareService {
       d.waterValues = d.waterValues.filter((v) => !waterIds.has(v.readingId));
       d.waterReadings = d.waterReadings.filter((r) => r.tankId !== id);
       d.waterParameters = d.waterParameters.filter((p) => p.tankId !== id);
+      d.readingPresets = d.readingPresets.filter((p) => p.tankId !== id);
+      d.waterTargets = d.waterTargets.filter((p) => p.tankId !== id);
+      d.tankPreferences = d.tankPreferences.filter((p) => p.tankId !== id);
+      d.journalEntries = d.journalEntries.filter((p) => p.tankId !== id);
       d.logs = d.logs.filter((l) => l.tankId !== id);
       d.reminders = d.reminders.filter((r) => !ids.has(r.scheduleId));
       d.jobs = d.jobs.filter((j) => !ids.has(j.scheduleId));
