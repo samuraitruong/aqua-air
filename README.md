@@ -130,3 +130,9 @@ Tank details now link to parameter charts (7/30/90 days), per-tank measurement p
 Presets select fields without copying old values. Selected order is retained, and switching presets keeps typed values visible. Charts show one parameter/unit at a time, use current-device timezone date windows, and display water-change markers. Charts sample at most 200 points; statistics/exports retain every result. Reports filter the recorded local dates shown in care/measurement history.
 
 Photo journal entries store one resized local photo plus date/time and notes. Backup format 4 includes presets, targets, preferences, journal entries and photos; versions 1–3 remain readable. Exports are UTF-8 CSV or locally generated PDFs and cannot restore the app. PDF reports contain tank details, measurement statistics/history and care history, without photos. Expo Print is a new native module: rebuild the development app after installing dependencies (`npm run ios` / `npm run android`).
+
+### Download a standalone APK from CI
+
+After successful tests, CI builds a standalone Android preview APK (embedded JavaScript; no Metro server needed), using Java 17 and Gradle dependency/build caching. Open the workflow run in GitHub Actions → Artifacts → **aquaair-preview-apk**. The ZIP contains `Aqua-Air-Preview-<run-number>.apk` and `SHA256SUMS.txt`; artifacts are retained for 14 days. Supported ABIs are arm64-v8a and x86_64.
+
+The APK installs as **Aqua Air Preview** (`com.aquaair.app.preview`, scheme `aquaair-preview`) alongside production. CI generates a temporary preview signing key per run; no production signing credentials or Expo account are required. To install a later CI build, uninstall the previous Preview app first because its signing key changes; export a backup first if you want to retain preview data. Production installs/data are separate. Store releases still use the production local release commands and upload key.

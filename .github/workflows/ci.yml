@@ -87,6 +87,100 @@ jobs:
         with:
           path: web/
 
+  build-apk:
+    name: Build standalone preview APK
+    needs: test-and-build
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      CI: "1"
+      EXPO_NO_TELEMETRY: "1"
+      EXPO_OFFLINE: "1"
+      NODE_ENV: production
+      AQUAAIR_PREVIEW_BUILD: "1"
+      AQUAAIR_BUILD_NUMBER: ${{ github.run_number }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js and npm cache
+        uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies including build tools
+        run: npm ci --include=dev
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android platform and build tools
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Generate Android project
+        run: npx expo prebuild --platform android --no-install
+
+      - name: Set up Gradle and build cache
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          cache-read-only: ${{ github.event_name == 'pull_request' }}
+
+      - name: Create temporary preview signing key
+        env:
+          PREVIEW_KEYSTORE: ${{ runner.temp }}/aquaair-preview.jks
+        run: |
+          keytool -genkeypair -noprompt -keystore "$PREVIEW_KEYSTORE" \
+            -storepass aquaair-preview -keypass aquaair-preview \
+            -alias aquaair-preview -keyalg RSA -keysize 2048 -validity 30 \
+            -dname "CN=Aqua Air CI Preview"
+
+      # CI-only signing; the .preview package cannot replace production installs.
+      - name: Build APK with embedded JavaScript
+        working-directory: android
+        env:
+          AQUAAIR_ANDROID_KEYSTORE: ${{ runner.temp }}/aquaair-preview.jks
+          AQUAAIR_ANDROID_KEYSTORE_PASSWORD: aquaair-preview
+          AQUAAIR_ANDROID_KEY_ALIAS: aquaair-preview
+          AQUAAIR_ANDROID_KEY_PASSWORD: aquaair-preview
+        run: >-
+          ./gradlew :app:assembleRelease --no-daemon --build-cache --max-workers=2
+          -PreactNativeArchitectures=arm64-v8a,x86_64
+          -Dorg.gradle.jvmargs="-Xmx4g -XX:MaxMetaspaceSize=1g"
+
+      - name: Name APK and record checksum
+        env:
+          PREVIEW_BUILD_NUMBER: ${{ github.run_number }}
+        run: |
+          mkdir -p artifacts/android
+          cp android/app/build/outputs/apk/release/app-release.apk "artifacts/android/Aqua-Air-Preview-${PREVIEW_BUILD_NUMBER}.apk"
+          cd artifacts/android
+          sha256sum ./*.apk > SHA256SUMS.txt
+
+      - name: Upload preview APK
+        uses: actions/upload-artifact@v7
+        with:
+          name: aquaair-preview-apk
+          path: artifacts/android/
+          if-no-files-found: error
+          retention-days: 14
+          compression-level: 0
+
+      - name: Remove temporary signing key
+        if: always()
+        env:
+          PREVIEW_KEYSTORE: ${{ runner.temp }}/aquaair-preview.jks
+        run: rm -f "$PREVIEW_KEYSTORE"
+
   deploy-website:
     name: Deploy website to GitHub Pages
     needs: test-and-build

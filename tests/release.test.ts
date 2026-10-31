@@ -79,3 +79,33 @@ test("release builds reject insufficient disk space and Android debug certificat
     assertUploadCertificate("CN=Truong Nguyen\nO=Aqua Air"),
   );
 });
+
+test("CI preview app uses a separate Android identity and leaves production defaults intact", async () => {
+  const { default: configure } = await import("../app.config");
+  const previous = process.env.AQUAAIR_PREVIEW_BUILD;
+  const context = {
+    config: {
+      name: "Aqua Air",
+      slug: "aqua-air",
+      scheme: "aquaair",
+      android: { package: "com.aquaair.app" },
+      ios: { bundleIdentifier: "com.aquaair.app" },
+    },
+  } as any;
+  try {
+    delete process.env.AQUAAIR_PREVIEW_BUILD;
+    const production = configure(context);
+    assert.equal(production.android?.package, "com.aquaair.app");
+    assert.equal(production.name, "Aqua Air");
+    assert.equal(production.scheme, "aquaair");
+    process.env.AQUAAIR_PREVIEW_BUILD = "1";
+    const preview = configure(context);
+    assert.equal(preview.android?.package, "com.aquaair.app.preview");
+    assert.equal(preview.name, "Aqua Air Preview");
+    assert.equal(preview.scheme, "aquaair-preview");
+    assert.equal(preview.ios?.bundleIdentifier, "com.aquaair.app");
+  } finally {
+    if (previous === undefined) delete process.env.AQUAAIR_PREVIEW_BUILD;
+    else process.env.AQUAAIR_PREVIEW_BUILD = previous;
+  }
+});
